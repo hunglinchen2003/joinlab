@@ -1,278 +1,1133 @@
-<title>BiotechOpoly · 陳宏霖實驗室大富翁</title>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>陳宏霖老師實驗室導覽 · BiotechOpoly</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#060818;--fg:#f0f4ff;--muted:#8899cc;--border:#1e2a5a;
-  --card:#0d1535;--card2:#111b40;
-  --pink:#f472b6;--blue:#60a5fa;--green:#4ade80;--purple:#c084fc;
-  --orange:#fb923c;--yellow:#fbbf24;--teal:#2dd4bf;--red:#f87171;
-  --cell-w:82px;--cell-h:82px;--cell-reg-w:72px;
+  --bg-deep:#070b22;
+  --bg-mid:#101942;
+  --board-border:#141e3c;
+  --cell-bg:#e8f8f5;
+  --cell-bg-2:#dff5f2;
+  --cell-ink:#111d38;
+  --cell-sub:#2b426b;
+  --pink:#ff4d94;
+  --blue:#3a86ff;
+  --cyan:#00bbf9;
+  --green:#2ec4b6;
+  --lime:#57cc99;
+  --purple:#9b5de5;
+  --orange:#ff9f1c;
+  --yellow:#ffd166;
+  --red:#ef476f;
+  /* Wide 16:10 rectangular board dimensions */
+  --corner-w:146px;
+  --corner-h:104px;
+  --topbot-w:122px;
+  --leftright-h:82px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Outfit','Noto Sans TC',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden}
+html,body{
+  height:100%;
+  font-family:'Outfit','Noto Sans TC',sans-serif;
+  background:linear-gradient(135deg, #fffdf7 0%, #eff8ff 36%, #e6faf5 70%, #fdf2f8 100%);
+  color:#1e293b;
+  overflow:hidden;
+  user-select:none;
+}
 
-/* ── NAV ── */
-nav{height:48px;background:#0a0f28cc;backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);display:flex;align-items:center;
-  padding:0 max(14px,env(safe-area-inset-left,0px));gap:10px;position:relative;z-index:50}
-.nav-logo{font-family:'Outfit',sans-serif;font-size:15px;font-weight:900;
-  background:linear-gradient(90deg,#f472b6,#60a5fa,#4ade80);-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;letter-spacing:.02em}
-.nav-sub{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.06em}
+/* ── FLOATING SOFT PASTEL BIOTECH BACKGROUND ── */
+.cosmic-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+}
+.cosmic-bg svg{
+  width:100%;height:100%;
+}
+
+/* ── TOP NAVIGATION BAR (BRIGHT FROSTED GLASS) ── */
+nav{
+  height:50px;
+  background:rgba(255,255,255,0.86);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:2px solid rgba(148,163,184,0.25);
+  display:flex;align-items:center;
+  padding:0 max(16px,env(safe-area-inset-left,0px));
+  gap:10px;position:relative;z-index:50;
+  box-shadow:0 4px 18px rgba(15,23,42,0.06);
+}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-badge-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,#38bdf8,#a855f7);
+  border:2px solid #0b132b;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 2px 0 #0b132b;
+}
+.nav-logo{
+  font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;
+  background:linear-gradient(90deg,#0284c7,#7c3aed,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:.03em;line-height:1.1;
+}
+.nav-sub{font-size:11px;font-weight:800;color:#475569;letter-spacing:.04em}
 .nav-sp{flex:1}
-#nav-turn{font-size:12px;font-weight:700;color:var(--yellow);background:#1a1200;
-  padding:4px 12px;border-radius:20px;border:1px solid #3a2800}
+.nav-3d-btn{
+  padding:5px 13px;border-radius:99px;
+  border:2px solid #0b132b;
+  background:#e0f2fe;
+  color:#0f172a;font-size:11.5px;font-weight:900;
+  box-shadow:0 2px 0 #0b132b;
+  cursor:pointer;transition:all .18s;
+}
+.nav-3d-btn:hover{background:#bae6fd;transform:translateY(-1px)}
+.nav-last-roll{
+  font-size:12px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#3a86ff,#8338ec);
+  border:2px solid #0b132b;
+  padding:4px 13px;border-radius:99px;
+  display:none;align-items:center;gap:6px;
+  box-shadow:0 2px 0 #0b132b;
+}
+.nav-last-roll.show{display:inline-flex}
+#nav-turn{
+  font-size:12px;font-weight:900;color:#111d38;
+  background:linear-gradient(135deg,#ffd166,#ff9f1c);
+  padding:5px 14px;border-radius:99px;
+  border:2px solid #0b132b;
+  box-shadow:0 2px 0 #0b132b;
+  display:none;align-items:center;gap:6px;
+}
+#nav-turn.show{display:inline-flex}
 
-/* ── LAYOUT ── */
-.wrap{height:calc(100% - 48px);display:flex;align-items:center;justify-content:center;
-  padding:8px;overflow:hidden}
+/* ── MAIN STAGE WRAP WITH 3D PERSPECTIVE ── */
+.wrap{
+  height:calc(100% - 50px);
+  display:flex;align-items:center;justify-content:center;
+  padding:4px;overflow:hidden;position:relative;z-index:2;
+}
 
-/* ── BOARD ── */
-.board-scale{transform-origin:top center;transition:transform .2s}
-.board-wrap{padding:4px;border-radius:12px;
-  background:linear-gradient(135deg,#f472b6,#818cf8,#34d399,#fbbf24,#60a5fa,#fb923c,#f472b6);
-  background-size:300% 300%;animation:rainbowBorder 4s linear infinite;
-  box-shadow:0 0 40px #6060ff50,0 0 80px #f472b620}
-@keyframes rainbowBorder{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+/* ── 3D TABLETOP BOARD FRAME (SINGLE CLEAN 3D PLANE FOR ACCURATE CLICK HIT-TESTING) ── */
+.board-scale{
+  transform-origin:center center;
+  transition:transform .25s ease;
+}
+.board-3d-tilt{
+  transform:perspective(1300px) rotateX(19deg) translateY(-6px);
+  transition:transform .45s cubic-bezier(.25,.8,.25,1);
+}
+.board-3d-tilt.flat-mode{
+  transform:perspective(1300px) rotateX(0deg) translateY(0);
+}
+.board-wrap{
+  padding:11px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#72efdd 0%,#38bdf8 50%,#60a5fa 100%);
+  border:3.5px solid #0b132b;
+  position:relative;
+  /* Soft Bright Tabletop 3D Extrusion & Natural Drop Shadow */
+  box-shadow:
+    0 6px 0 #0284c7,
+    0 12px 0 #0369a1,
+    0 18px 0 #1e3a8a,
+    0 22px 0 #0b132b,
+    0 34px 65px rgba(30,64,175,0.22),
+    0 14px 28px rgba(15,23,42,0.14),
+    inset 0 3px 5px rgba(255,255,255,0.75);
+}
+/* 3D Side Lip highlight */
+.board-wrap::after{
+  content:'';position:absolute;left:12px;right:12px;bottom:-14px;height:12px;
+  background:linear-gradient(90deg,rgba(56,189,248,0.2),rgba(114,239,221,0.5),rgba(56,189,248,0.2));
+  border-radius:0 0 18px 18px;
+  pointer-events:none;
+}
+
 .board{
   display:grid;
-  grid-template-columns:var(--cell-w) repeat(6,var(--cell-reg-w)) var(--cell-w);
-  grid-template-rows:var(--cell-h) repeat(6,var(--cell-reg-w)) var(--cell-h);
-  background:linear-gradient(135deg,#0d1535,#070c22);
-  border-radius:8px;
-  position:relative}
-/* Board starfield */
-.board::before{content:'';position:absolute;inset:0;border-radius:8px;
-  background-image:radial-gradient(circle,#fff 1px,transparent 1px);
-  background-size:24px 24px;opacity:.06;pointer-events:none}
+  grid-template-columns:var(--corner-w) repeat(6,var(--topbot-w)) var(--corner-w);
+  grid-template-rows:var(--corner-h) repeat(6,var(--leftright-h)) var(--corner-h);
+  background:#141e3c;
+  gap:2.5px;
+  border:3.5px solid #141e3c;
+  border-radius:14px;
+  position:relative;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,0.6);
+}
 
-/* ── CENTER ── */
+/* ── SQUARES (3D ELEVATED TILES) ── */
+.sq{
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  cursor:pointer;overflow:hidden;
+  background:linear-gradient(180deg,#f5fffd 0%,#dcf4f0 100%);
+  color:var(--cell-ink);
+  padding:4px 5px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.9), inset 0 -3px 0 rgba(148,163,184,0.35);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+}
+.sq:hover{
+  transform:translateY(-6px) scale(1.05);
+  z-index:20;
+  box-shadow:0 12px 22px rgba(15,23,42,0.38), 0 5px 0 #1d3557, inset 0 0 0 2.5px #3a86ff;
+}
+.sq.active-step{
+  z-index:22;
+  transform:translateY(-4px) scale(1.03);
+  background:linear-gradient(180deg,#fffbeb 0%,#fef08a 100%) !important;
+  box-shadow:0 8px 20px rgba(255,77,148,0.55), 0 4px 0 #be185d, inset 0 0 0 3.5px #ff4d94 !important;
+}
+
+/* Inner Color Strip facing the Center with 3D Bevel */
+.sq-strip{
+  position:absolute;
+  z-index:2;
+  box-shadow:inset 0 2px 2px rgba(255,255,255,0.45), inset 0 -2px 2px rgba(0,0,0,0.2);
+}
+.sq.top{padding-bottom:16px}
+.sq.top .sq-strip{
+  left:0;right:0;bottom:0;height:13px;
+  border-top:2.5px solid #141e3c;
+}
+.sq.bot{padding-top:16px}
+.sq.bot .sq-strip{
+  left:0;right:0;top:0;height:13px;
+  border-bottom:2.5px solid #141e3c;
+}
+.sq.left{padding-right:18px}
+.sq.left .sq-strip{
+  top:0;bottom:0;right:0;width:14px;
+  border-left:2.5px solid #141e3c;
+}
+.sq.right{padding-left:18px}
+.sq.right .sq-strip{
+  top:0;bottom:0;left:0;width:14px;
+  border-right:2.5px solid #141e3c;
+}
+
+/* Cell Text Header */
+.sq-head{
+  text-align:center;
+  width:100%;
+  z-index:3;
+  line-height:1.12;
+  margin-top:1px;
+}
+.sq-name{
+  font-size:11.5px;
+  font-weight:900;
+  color:#0f172a;
+  letter-spacing:-0.01em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sq-en{
+  font-size:8px;
+  font-weight:800;
+  color:#334e7b;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sq.left .sq-name, .sq.right .sq-name{font-size:11px}
+.sq.left .sq-en, .sq.right .sq-en{font-size:7.5px}
+
+/* Cell Cute Vector Illustration */
+.sq-art{
+  flex:1;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  z-index:2;
+  min-height:0;
+}
+.sq-art svg{
+  width:100%;
+  height:100%;
+  max-height:58px;
+  overflow:visible;
+  pointer-events:none;
+}
+.sq.left .sq-art svg, .sq.right .sq-art svg{
+  max-height:46px;
+}
+.sq.corner .sq-art svg{
+  max-height:74px;
+}
+
+/* Corner Specific Styling */
+.sq.corner{
+  background:linear-gradient(145deg,#f6fffd 0%,#d7f3ee 100%);
+  padding:5px;
+  justify-content:space-between;
+}
+.sq.corner:hover{
+  border-radius:6px;
+}
+.sq.corner-jail{
+  padding:0;
+  display:grid;
+  grid-template-columns:22px 1fr;
+  grid-template-rows:1fr 24px;
+}
+.jail-side-label{
+  grid-column:1;grid-row:1/3;
+  background:#e8f8f5;
+  border-right:2.5px solid #141e3c;
+  display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;font-weight:900;color:#111d38;letter-spacing:.12em;
+}
+.jail-box{
+  grid-column:2;grid-row:1;
+  background:linear-gradient(180deg,#ff9f1c 0%,#ffbf69 100%);
+  border-bottom:2.5px solid #141e3c;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.jail-bottom-label{
+  grid-column:2;grid-row:2;
+  background:#e8f8f5;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  line-height:1.05;
+}
+
+/* ── 3D WALKING LITTLE PEOPLE LAYER (#walkers-layer) ── */
+.walkers-layer, .walkers-layer *{
+  pointer-events:none !important;
+}
+.walkers-layer{
+  position:absolute;
+  inset:0;
+  z-index:40;
+}
+.walker{
+  position:absolute;
+  width:52px;
+  height:68px;
+  /* Stand tall on the board without breaking 3D hit-testing */
+  transform:translate(-50%, -88%) scaleY(1.08);
+  transform-origin:50% 90%;
+  transition:left 0.32s linear, top 0.32s linear;
+  z-index:42;
+}
+.board-3d-tilt.flat-mode .walker{
+  transform:translate(-50%, -84%) scaleY(1);
+}
+.walker.active-turn{
+  z-index:48;
+}
+
+/* Floating Player Name Badge above the Walking Person */
+.walker-label{
+  position:absolute;
+  top:-16px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#0b132b;
+  color:#fff;
+  font-size:9.5px;
+  font-weight:900;
+  padding:1.5px 7px;
+  border-radius:99px;
+  border:1.5px solid #fff;
+  white-space:nowrap;
+  box-shadow:0 2px 6px rgba(0,0,0,0.6);
+  display:flex;align-items:center;gap:3px;
+}
+.walker.active-turn .walker-label{
+  background:#ffd166;
+  color:#0b132b;
+  border-color:#0b132b;
+  transform:translateX(-50%) scale(1.08);
+}
+
+/* Character SVG Flip & Articulated Limb Animations */
+.walker-svg{
+  width:52px;
+  height:64px;
+  overflow:visible;
+  transition:transform 0.15s ease;
+}
+.walker[data-dir="-1"] .walker-svg{
+  transform:scaleX(-1);
+}
+
+/* Idle gentle breathing when standing still */
+.walker .ch-body-group{
+  transform-origin:26px 46px;
+  animation:idleBreathe 1.8s ease-in-out infinite;
+}
+@keyframes idleBreathe{
+  0%,100%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-1.5px) scaleY(1.02)}
+}
+
+/* Walking Articulated Limb & Hop Animations */
+.walker.walking .ch-body-group{
+  animation:walkHop 0.16s ease-in-out infinite alternate;
+}
+.walker.walking .ch-leg-l{
+  animation:swingLegL 0.16s ease-in-out infinite alternate;
+}
+.walker.walking .ch-leg-r{
+  animation:swingLegR 0.16s ease-in-out infinite alternate;
+}
+.walker.walking .ch-arm-l{
+  animation:swingArmL 0.16s ease-in-out infinite alternate;
+}
+.walker.walking .ch-arm-r{
+  animation:swingArmR 0.16s ease-in-out infinite alternate;
+}
+.walker.walking .ch-shadow{
+  animation:shadowPulse 0.16s ease-in-out infinite alternate;
+}
+
+.ch-leg-l, .ch-leg-r{transform-origin:26px 45px}
+.ch-arm-l, .ch-arm-r{transform-origin:26px 32px}
+.ch-shadow{transform-origin:26px 59px}
+
+@keyframes walkHop{
+  0%{transform:translateY(0) rotate(-3deg)}
+  100%{transform:translateY(-6px) rotate(4deg)}
+}
+@keyframes swingLegL{
+  0%{transform:rotate(-34deg)}
+  100%{transform:rotate(34deg)}
+}
+@keyframes swingLegR{
+  0%{transform:rotate(34deg)}
+  100%{transform:rotate(-34deg)}
+}
+@keyframes swingArmL{
+  0%{transform:rotate(30deg)}
+  100%{transform:rotate(-30deg)}
+}
+@keyframes swingArmR{
+  0%{transform:rotate(-30deg)}
+  100%{transform:rotate(30deg)}
+}
+@keyframes shadowPulse{
+  0%{transform:scale(1);opacity:0.45}
+  100%{transform:scale(0.75);opacity:0.25}
+}
+
+/* ── CENTER HUB: 未來生技研發中心 (SOFT BRIGHT PASTEL LAB STAGE) ── */
 .board-center{
   grid-column:2/8;grid-row:2/8;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
-  background:radial-gradient(ellipse at 40% 25%,#1e1272 0%,#080520 60%,#030210 100%);
-  border-radius:4px;position:relative;overflow:hidden;padding:10px;
-  border:1px solid #2a2060}
-.board-center::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 40%,#6040c025 0%,transparent 65%);
-  pointer-events:none}
-/* rotating glow ring */
-.board-center::after{content:'';position:absolute;inset:-2px;border-radius:6px;
-  background:conic-gradient(from 0deg,#f472b650,#818cf850,#34d39950,#fbbf2450,#60a5fa50,#f472b650);
-  opacity:.3;animation:spinGlow 6s linear infinite;z-index:0;pointer-events:none}
-@keyframes spinGlow{to{transform:rotate(360deg)}}
-.bc-logo{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;line-height:1.15;text-align:center;
-  background:linear-gradient(135deg,#f472b6,#a78bfa,#34d399);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  position:relative;z-index:1;filter:drop-shadow(0 0 12px #818cf850)}
-.bc-sub{font-size:9px;font-weight:700;color:#a0b0e0;letter-spacing:.08em;text-align:center;
-  margin-top:-4px;position:relative;z-index:1}
-.bc-dna{font-size:32px;margin:2px 0;filter:drop-shadow(0 0 12px #818cf8);position:relative;z-index:1;
-  animation:floatDna 3s ease-in-out infinite}
-@keyframes floatDna{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.players-on-board{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;min-height:24px}
-.player-chip{display:flex;align-items:center;gap:4px;background:var(--card2);
-  border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;
-  border:1.5px solid currentColor}
-.dice-area{display:flex;align-items:center;gap:8px;margin-top:4px}
-.dice{width:44px;height:44px;background:linear-gradient(135deg,#fff,#e8eaff);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;
-  box-shadow:0 4px 16px #0008,0 0 0 2px rgba(255,255,255,0.15);
-  cursor:default;transition:transform .1s;user-select:none}
-.dice.rolling{animation:diceRoll .4s ease infinite}
-@keyframes diceRoll{0%{transform:rotate(0) scale(1)}25%{transform:rotate(18deg) scale(1.15)}50%{transform:rotate(-12deg) scale(0.88)}75%{transform:rotate(9deg) scale(1.08)}100%{transform:rotate(0) scale(1)}}
-/* Dice result pop */
-.dice-result{font-size:15px;font-weight:900;text-align:center;padding:6px 14px;
-  border-radius:20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);
-  color:#fff;letter-spacing:.05em;box-shadow:0 4px 18px #6366f170;
-  transition:all .35s cubic-bezier(.34,1.4,.64,1);opacity:0;transform:scale(0.6);
-  white-space:nowrap;position:relative;z-index:5;min-height:32px;display:flex;
-  align-items:center;justify-content:center}
-.dice-result.show{opacity:1;transform:scale(1)}
-#roll-btn{padding:7px 16px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:800;
-  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
-  box-shadow:0 4px 16px #6366f140;transition:all .2s;letter-spacing:.04em;white-space:nowrap}
-#roll-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px #6366f160}
-#roll-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-#join-btn{padding:8px 18px;border-radius:20px;border:2px solid var(--pink);cursor:pointer;
-  font-size:12px;font-weight:800;background:transparent;color:var(--pink);
-  transition:all .2s;letter-spacing:.04em}
-#join-btn:hover{background:var(--pink);color:#fff;box-shadow:0 4px 16px #f472b640}
+  position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 45%, #ffffff 0%, #e0f7fa 48%, #bae6fd 100%);
+  border:3px solid #38bdf8;
+  box-shadow:
+    inset 0 6px 20px rgba(14,116,144,0.18),
+    inset 0 0 30px rgba(255,255,255,0.8),
+    inset 0 0 0 2px #141e3c;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:12px 16px;
+}
 
-/* ── SQUARES ── */
-.sq{position:relative;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;cursor:pointer;overflow:hidden;
-  border:1px solid #1e2d6a;transition:all .2s;gap:2px}
-.sq:hover{filter:brightness(1.3) saturate(1.2);transform:scale(1.06);z-index:10;
-  box-shadow:inset 0 0 12px rgba(255,255,255,0.08)}
-.sq-strip{position:absolute;top:0;left:0;right:0;height:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.4)}
-/* Left col squares: strip on right */
-.sq.left .sq-strip{top:0;bottom:0;left:auto;right:0;width:13px;height:auto}
-/* Right col squares: strip on left */
-.sq.right .sq-strip{top:0;bottom:0;left:0;right:auto;width:13px;height:auto}
-/* Top row: strip on bottom */
-.sq.top .sq-strip{top:auto;bottom:0;height:14px;width:auto}
-.sq-emoji{font-size:20px;line-height:1;margin-top:14px;
-  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.7))}
-.sq.left .sq-emoji,.sq.right .sq-emoji{margin-top:0;font-size:17px}
-.sq.top .sq-emoji{margin-top:0;margin-bottom:14px}
-.sq-name{font-size:9px;font-weight:800;text-align:center;line-height:1.3;
-  color:#ffffff;padding:0 4px;margin-top:2px;
-  text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6);
-  letter-spacing:.01em}
-.sq.left .sq-name,.sq.right .sq-name{font-size:8.5px;writing-mode:vertical-rl;
-  text-orientation:mixed;transform:rotate(180deg);margin-top:0;
-  text-shadow:0 1px 4px rgba(0,0,0,0.9)}
-.sq.top .sq-name{margin-top:0;margin-bottom:2px}
-.sq-tokens{position:absolute;bottom:3px;left:0;right:0;display:flex;flex-wrap:wrap;
-  gap:1px;justify-content:center}
-.sq-token{font-size:12px;line-height:1;filter:drop-shadow(0 0 4px rgba(255,255,255,0.6))}
-/* Corner squares */
-.sq.corner{font-size:9px;font-weight:900;flex-direction:column;gap:3px}
-.sq.corner .sq-emoji{font-size:26px;margin-top:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
-.sq.corner .sq-name{font-size:9px;font-weight:900;color:#fff;
-  text-shadow:0 1px 6px rgba(0,0,0,0.8)}
+/* Background Isometric Lab Artwork Layer */
+.center-art-layer, .center-art-layer *{
+  pointer-events:none !important;
+}
+.center-art-layer{
+  position:absolute;inset:0;z-index:1;
+}
+.center-art-layer svg{
+  width:100%;height:100%;
+}
 
-/* Color-coded backgrounds — vivid dark gradients */
-.sq-bg-blue{background:linear-gradient(160deg,#0a1840 0%,#060e28 100%)}
-.sq-bg-green{background:linear-gradient(160deg,#0a2214 0%,#041208 100%)}
-.sq-bg-pink{background:linear-gradient(160deg,#280a22 0%,#160510 100%)}
-.sq-bg-purple{background:linear-gradient(160deg,#140a30 0%,#0a0420 100%)}
-.sq-bg-orange{background:linear-gradient(160deg,#241004 0%,#140600 100%)}
-.sq-bg-teal{background:linear-gradient(160deg,#041e22 0%,#020e12 100%)}
-.sq-bg-yellow{background:linear-gradient(160deg,#201800 0%,#120e00 100%)}
-.sq-bg-corner{background:linear-gradient(135deg,#0e1840 0%,#07102e 100%)}
-.sq-bg-chance{background:linear-gradient(160deg,#221002 0%,#140800 100%)}
-.sq-bg-grant{background:linear-gradient(160deg,#001428 0%,#000810 100%)}
+/* Top Row inside Center: 3D Tilted Title + Active Players / Controls */
+.center-top-bar{
+  position:relative;z-index:10;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;
+}
 
-/* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;background:#00000088;backdrop-filter:blur(6px);
-  z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+/* 3D Extruded Tilted Title (Left) */
+.iso-title-box{
+  transform:rotate(-14deg) skewX(-8deg);
+  transform-origin:top left;
+  margin-left:8px;margin-top:6px;
+  pointer-events:none;
+}
+.iso-biotech{
+  font-family:'Outfit',sans-serif;
+  font-size:34px;font-weight:900;line-height:0.95;
+  letter-spacing:.04em;
+  color:#38bdf8;
+  -webkit-text-stroke:2px #0b132b;
+  text-shadow:
+    1px 1px 0 #0b132b,
+    2px 2px 0 #0284c7,
+    3px 3px 0 #0369a1,
+    4px 4px 0 #1e3a8a,
+    5px 5px 0 #0b132b;
+}
+.iso-opoly{
+  font-family:'Outfit',sans-serif;
+  font-size:28px;font-weight:900;line-height:1.05;
+  letter-spacing:.06em;
+  color:#ffd166;
+  -webkit-text-stroke:2px #0b132b;
+  margin-left:14px;
+  text-shadow:
+    1px 1px 0 #0b132b,
+    2px 2px 0 #f77f00,
+    3px 3px 0 #d62828,
+    4px 4px 0 #0b132b;
+}
+.iso-sub{
+  font-size:13.5px;font-weight:900;
+  color:#0f172a;
+  background:rgba(255,255,255,0.95);
+  border:2px solid #0b132b;
+  padding:2px 12px;border-radius:99px;
+  display:inline-block;margin-top:4px;margin-left:6px;
+  box-shadow:0 3px 0 #0b132b;
+}
+
+/* Interactive Dice & Turn Console (Bright Cream Card) */
+.center-dice-console{
+  position:relative;
+  z-index:15;
+  pointer-events:auto;
+  background:#ffffff;
+  border:2.5px solid #0b132b;
+  border-radius:18px;
+  padding:10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  box-shadow:0 6px 0 #0b132b, 0 12px 24px rgba(15,23,42,0.16);
+  min-width:270px;
+}
+.console-top-row{
+  display:flex;align-items:center;gap:12px;width:100%;justify-content:center;
+}
+.die-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.dice{
+  width:52px;height:52px;
+  background:linear-gradient(145deg,#ffffff 0%,#f8fafc 65%,#e0f2fe 100%);
+  border-radius:12px;
+  border:2.5px solid #0b132b;
+  padding:6px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  place-items:center;
+  box-shadow:0 4px 0 #1e293b, 0 6px 12px rgba(15,23,42,0.18), inset 0 2px 3px #fff;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+.dice.rolled-glow{
+  border-color:#0b132b;
+  background:linear-gradient(145deg,#fffbeb 0%,#fef3c7 100%);
+  box-shadow:0 4px 0 #d97706, 0 0 16px rgba(251,191,36,0.75);
+}
+.dice.rolling{
+  animation:diceRoll3D .34s ease-in-out infinite;
+}
+@keyframes diceRoll3D{
+  0%{transform:rotate(0deg) scale(1)}
+  25%{transform:rotate(18deg) scale(1.14) translateY(-4px)}
+  50%{transform:rotate(-16deg) scale(0.92)}
+  75%{transform:rotate(12deg) scale(1.08) translateY(-2px)}
+  100%{transform:rotate(0deg) scale(1)}
+}
+.pip{
+  width:9px;height:9px;border-radius:50%;
+  background:#0f172a;
+  opacity:0;transform:scale(0.3);
+  transition:opacity .1s ease, transform .14s cubic-bezier(.34,1.6,.64,1);
+}
+.pip.on{opacity:1;transform:scale(1)}
+.dice[data-val="1"] .pip.on{
+  width:13px;height:13px;
+  background:radial-gradient(circle at 35% 35%,#ef4444,#b91c1c);
+}
+.dice[data-val="4"] .pip.on{
+  background:radial-gradient(circle at 35% 35%,#ef4444,#b91c1c);
+}
+.die-num-tag{
+  font-size:10.5px;font-weight:900;color:#334155;
+  background:#f1f5f9;border:1.5px solid #94a3b8;
+  padding:1px 8px;border-radius:99px;
+}
+.die-num-tag.highlight{
+  color:#0b132b;background:#ffd166;border-color:#0b132b;
+}
+.dice-plus{
+  font-size:18px;font-weight:900;color:#64748b;margin-bottom:16px;
+}
+
+/* Dice Result Pill */
+.dice-result{
+  width:100%;
+  padding:5px 12px;
+  border-radius:10px;
+  background:#f1f5f9;
+  border:1.5px solid #cbd5e1;
+  color:#475569;
+  font-size:12.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  text-align:center;
+  transition:all .25s cubic-bezier(.34,1.4,.64,1);
+}
+.dice-result.show{
+  background:linear-gradient(135deg,#ff4d94,#8338ec,#3a86ff);
+  border:2px solid #0b132b;
+  color:#fff;
+  font-size:14px;font-weight:900;
+  box-shadow:0 3px 0 #0b132b, 0 4px 14px rgba(255,77,148,0.35);
+  transform:scale(1.03);
+}
+.dice-total-badge{
+  background:#ffd166;color:#0b132b;
+  padding:1px 8px;border-radius:99px;font-size:13.5px;font-weight:900;
+  border:1.5px solid #0b132b;
+}
+
+/* Console Buttons */
+.console-btns{
+  display:flex;align-items:center;gap:8px;width:100%;justify-content:center;
+}
+#roll-btn{
+  flex:1;padding:7px 14px;border-radius:99px;
+  border:2px solid #0b132b;cursor:pointer;
+  font-size:12.5px;font-weight:900;
+  background:linear-gradient(180deg,#ffd166 0%,#ff9f1c 100%);
+  color:#0b132b;
+  box-shadow:0 3px 0 #0b132b;
+  transition:all .15s;
+}
+#roll-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 5px 0 #0b132b, 0 0 14px rgba(255,209,102,0.6);
+}
+#roll-btn:disabled{
+  opacity:.48;cursor:not-allowed;transform:none;box-shadow:none;
+}
+#join-btn{
+  padding:7px 13px;border-radius:99px;
+  border:2px solid #0b132b;cursor:pointer;
+  font-size:12px;font-weight:900;
+  background:linear-gradient(180deg,#72efdd 0%,#00bbf9 100%);
+  color:#0b132b;
+  box-shadow:0 3px 0 #0b132b;
+  transition:all .15s;
+}
+#join-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 5px 0 #0b132b, 0 0 14px rgba(114,239,221,0.6);
+}
+
+/* 3D Tilted Card Decks (機會 & 命運) + Bottom Player Bar */
+.center-bottom-bar{
+  position:relative;z-index:10;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:10px;
+}
+
+.card-deck-3d{
+  pointer-events:auto;
+  width:136px;height:96px;
+  border-radius:14px;
+  border:2.5px solid #0b132b;
+  padding:8px 10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  position:relative;
+  z-index:12;
+  transition:transform .2s cubic-bezier(.34,1.5,.64,1);
+}
+.card-deck-3d.chance-deck{
+  background:linear-gradient(135deg,#ff4d94 0%,#ffd166 50%,#00bbf9 100%);
+  transform:rotate(22deg) skewX(-10deg);
+  margin-left:14px;margin-bottom:8px;
+  box-shadow:
+    -3px 4px 0 #f8f9fa,
+    -5px 6px 0 #0b132b,
+    -8px 10px 0 #e2e8f0,
+    -10px 12px 0 #0b132b,
+    0 14px 24px rgba(0,0,0,0.45);
+}
+.card-deck-3d.chance-deck:hover{
+  transform:rotate(20deg) skewX(-8deg) translateY(-6px) scale(1.05);
+}
+.card-deck-3d.grant-deck{
+  background:linear-gradient(135deg,#ff4d94 0%,#b5179e 55%,#7209b7 100%);
+  transform:rotate(-22deg) skewX(10deg);
+  margin-right:14px;margin-bottom:8px;
+  box-shadow:
+    3px 4px 0 #f8f9fa,
+    5px 6px 0 #0b132b,
+    8px 10px 0 #e2e8f0,
+    10px 12px 0 #0b132b,
+    0 14px 24px rgba(0,0,0,0.45);
+}
+.card-deck-3d.grant-deck:hover{
+  transform:rotate(-20deg) skewX(8deg) translateY(-6px) scale(1.05);
+}
+.deck-tag{
+  font-size:13px;font-weight:900;color:#fff;
+  text-shadow:0 2px 0 #0b132b;
+  letter-spacing:.08em;
+}
+.deck-icon{
+  font-size:30px;line-height:1;
+  text-shadow:0 3px 3px rgba(0,0,0,0.35);
+}
+.deck-sub{
+  font-size:9.5px;font-weight:900;color:#fff;
+  text-shadow:0 1px 2px #0b132b;
+  text-align:center;line-height:1.1;
+}
+
+/* Center Bottom Label & Players Strip */
+.center-mid-footer{
+  pointer-events:auto;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  flex:1;max-width:410px;
+}
+.lab-center-title{
+  font-size:14.5px;font-weight:900;color:#0f172a;
+  letter-spacing:.1em;
+  background:rgba(255,255,255,0.92);
+  border:2px solid #0b132b;
+  box-shadow:0 3px 0 #0b132b;
+  padding:3px 16px;border-radius:99px;
+}
+.pl-list{
+  display:flex;flex-wrap:wrap;gap:5px;justify-content:center;
+  width:100%;
+}
+.pl-empty{
+  font-size:11px;font-weight:800;color:#0369a1;
+  background:rgba(255,255,255,0.88);
+  border:2px dashed #38bdf8;
+  border-radius:99px;padding:4px 14px;
+}
+.pl-item{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:99px;
+  background:rgba(255,255,255,0.94);
+  border:2px solid #0b132b;
+  box-shadow:0 2px 0 #0b132b;
+  font-size:11px;font-weight:900;
+  transition:all .2s;
+}
+.pl-item.active{
+  background:#fffbeb;
+  border-color:#0b132b;
+  box-shadow:0 3px 0 #d97706, 0 0 12px rgba(251,191,36,0.75);
+  transform:translateY(-2px);
+}
+.pl-dot{
+  width:8px;height:8px;border-radius:50%;
+}
+.pl-pos{
+  font-size:9.5px;color:#0f172a;font-weight:900;
+  background:#fde68a;border:1px solid #0b132b;padding:1px 6px;border-radius:99px;
+}
+
+/* ── MODALS ── */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(15,23,42,0.42);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;
+}
 .modal-bg.hidden{display:none}
-.modal{background:var(--card);border:1.5px solid var(--border);border-radius:20px;
-  padding:24px;width:min(420px,100%);max-height:90vh;overflow-y:auto;
-  box-shadow:0 24px 64px #000a;animation:popIn .25s cubic-bezier(.34,1.4,.64,1)}
-@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(10px)}}
-.modal h2{font-size:18px;font-weight:900;margin-bottom:4px}
-.modal p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7}
-.modal-close{position:absolute;top:14px;right:16px;background:var(--border);
-  border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;color:var(--muted);
-  font-size:14px;display:flex;align-items:center;justify-content:center}
-.modal{position:relative}
-/* Avatar pick */
+.modal{
+  background:linear-gradient(180deg,#ffffff 0%,#f0fdf4 100%);
+  color:#0f172a;
+  border:3.5px solid #0b132b;
+  border-radius:24px;
+  padding:24px;width:min(440px,100%);max-height:90vh;overflow-y:auto;
+  box-shadow:0 10px 0 #0b132b, 0 24px 60px rgba(15,23,42,0.28);
+  animation:popIn .24s cubic-bezier(.34,1.4,.64,1);
+  position:relative;
+}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(12px)}}
+.modal h2{font-size:21px;font-weight:900;margin-bottom:4px;color:#0b132b}
+.modal p{font-size:13px;color:#334155;margin-bottom:14px;line-height:1.65;font-weight:600}
+.modal-close{
+  position:absolute;top:14px;right:14px;
+  background:#fff;border:2px solid #0b132b;
+  border-radius:50%;width:32px;height:32px;cursor:pointer;color:#0b132b;
+  font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 0 #0b132b;
+}
+.modal-close:hover{background:#ff4d94;color:#fff}
+
+.modal-roll-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#3a86ff,#8338ec);
+  border:2px solid #0b132b;
+  color:#fff;font-size:12px;font-weight:900;
+  padding:5px 12px;border-radius:99px;margin-bottom:10px;
+  box-shadow:0 3px 0 #0b132b;
+}
+
 .avatar-row{display:flex;gap:12px;margin-bottom:16px;justify-content:center}
-.avatar-btn{width:70px;height:70px;border-radius:14px;border:2.5px solid var(--border);
-  background:var(--card2);font-size:36px;cursor:pointer;transition:all .18s;
-  display:flex;align-items:center;justify-content:center}
-.avatar-btn.on{border-color:var(--pink);box-shadow:0 0 16px var(--pink)40;transform:scale(1.08)}
-/* Color pick */
-.color-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.color-btn{width:32px;height:32px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:all .15s}
-.color-btn.on{border-color:#fff;transform:scale(1.15);box-shadow:0 0 10px currentColor}
-/* Name input */
-.name-inp{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);
-  background:var(--card2);color:var(--fg);font-size:14px;font-weight:600;
-  font-family:'Noto Sans TC',sans-serif;margin-bottom:14px;outline:none}
-.name-inp:focus{border-color:#6366f1;box-shadow:0 0 0 3px #6366f120}
-.modal-btn{width:100%;padding:11px;border-radius:12px;border:none;cursor:pointer;
-  font-size:14px;font-weight:800;letter-spacing:.04em;transition:all .18s}
-.modal-btn.primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
-  box-shadow:0 4px 16px #6366f130}
-.modal-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px #6366f150}
-/* Square info modal */
-.sq-info-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
-  border-radius:20px;font-size:11px;font-weight:700;margin-bottom:10px}
-.learn-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.learn-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;
-  background:var(--card2);border-radius:10px;font-size:12px;line-height:1.6;
-  border-left:3px solid currentColor}
-.learn-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-/* Card modal */
-.card-visual{font-size:48px;text-align:center;margin:10px 0;
-  filter:drop-shadow(0 0 16px var(--yellow))}
-.card-effect{background:var(--card2);border-radius:12px;padding:12px 16px;
-  font-size:13px;font-weight:700;text-align:center;border:1.5px solid var(--border);margin-top:8px}
-/* Message toast */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:var(--card);border:1.5px solid var(--border);border-radius:20px;
-  padding:10px 20px;font-size:13px;font-weight:700;z-index:200;
-  box-shadow:0 8px 32px #0008;transition:transform .3s ease;white-space:nowrap}
+.avatar-btn{
+  width:80px;height:86px;border-radius:16px;border:2.5px solid #0b132b;
+  background:#fff;cursor:pointer;transition:all .16s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  box-shadow:0 4px 0 #0b132b;font-size:11px;font-weight:900;color:#0b132b;
+}
+.avatar-btn svg{width:46px;height:52px;overflow:visible}
+.avatar-btn.on{
+  background:#ffd166;
+  transform:translateY(-3px);
+  box-shadow:0 6px 0 #0b132b;
+}
+.color-row{display:flex;gap:10px;margin-bottom:16px;justify-content:center;flex-wrap:wrap}
+.color-btn{
+  width:34px;height:34px;border-radius:50%;border:2.5px solid #0b132b;
+  cursor:pointer;transition:all .15s;box-shadow:0 2px 0 #0b132b;
+}
+.color-btn.on{transform:scale(1.2);box-shadow:0 4px 0 #0b132b}
+.name-inp{
+  width:100%;padding:11px 14px;border-radius:12px;border:2.5px solid #0b132b;
+  background:#fff;color:#0b132b;font-size:14px;font-weight:800;
+  font-family:'Noto Sans TC',sans-serif;margin-bottom:16px;outline:none;
+}
+.modal-btn{
+  width:100%;padding:12px;border-radius:14px;border:2.5px solid #0b132b;cursor:pointer;
+  font-size:14px;font-weight:900;letter-spacing:.04em;transition:all .16s;
+  box-shadow:0 4px 0 #0b132b;
+}
+.modal-btn.primary{
+  background:linear-gradient(180deg,#ffd166 0%,#ff9f1c 100%);color:#0b132b;
+}
+.modal-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 0 #0b132b}
+
+.sq-info-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border-radius:99px;font-size:11px;font-weight:900;margin-bottom:8px;
+  border:2px solid #0b132b;box-shadow:0 2px 0 #0b132b;
+}
+.learn-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.learn-item{
+  display:flex;align-items:flex-start;gap:9px;padding:8px 12px;
+  background:#ffffff;border-radius:12px;font-size:12.5px;line-height:1.55;
+  border:2px solid #0b132b;box-shadow:0 3px 0 #cbd5e1;
+  color:#1e293b;font-weight:700;
+}
+.learn-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+
+.card-visual{font-size:52px;text-align:center;margin:8px 0}
+.card-effect{
+  background:#fff;border-radius:12px;padding:12px 16px;
+  font-size:14px;font-weight:900;text-align:center;
+  border:2.5px solid #0b132b;margin-top:8px;box-shadow:0 3px 0 #0b132b;
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:#ffd166;color:#0b132b;
+  border:3px solid #0b132b;border-radius:99px;
+  padding:10px 22px;font-size:13.5px;font-weight:900;z-index:200;
+  box-shadow:0 5px 0 #0b132b, 0 12px 28px rgba(15,23,42,0.25);
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1);white-space:nowrap;
+}
 .toast.show{transform:translateX(-50%) translateY(0)}
-/* Player list in center */
-.pl-list{display:flex;flex-direction:column;gap:4px;width:100%;max-width:200px}
-.pl-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;
-  background:var(--card2);font-size:10px;font-weight:700;border:1px solid var(--border)}
-.pl-item.active{box-shadow:0 0 0 1.5px var(--yellow)}
-.pl-pos{font-size:8px;color:var(--muted);margin-left:auto}
 </style>
+</head>
+<body>
+
+<!-- Soft Bright Pastel Biotech Background Decorations -->
+<div class="cosmic-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="glowCyan" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="glowPink" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#f9a8d4" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#f9a8d4" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="glowYellow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fde68a" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#fde68a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <!-- Soft Pastel Watercolor Blobs -->
+    <circle cx="160" cy="180" r="240" fill="url(#glowCyan)"/>
+    <circle cx="1280" cy="720" r="260" fill="url(#glowPink)"/>
+    <circle cx="1290" cy="170" r="220" fill="url(#glowYellow)"/>
+    <circle cx="180" cy="740" r="240" fill="url(#glowPink)"/>
+    <!-- Pastel Soap Bubbles -->
+    <circle cx="75" cy="190" r="24" fill="#ffffff" fill-opacity="0.65" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="48" cy="340" r="15" fill="#ffffff" fill-opacity="0.65" stroke="#f472b6" stroke-width="2"/>
+    <circle cx="95" cy="760" r="18" fill="#ffffff" fill-opacity="0.65" stroke="#34d399" stroke-width="2"/>
+    <circle cx="1370" cy="460" r="22" fill="#ffffff" fill-opacity="0.65" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="1335" cy="145" r="14" fill="#ffffff" fill-opacity="0.65" stroke="#fbbf24" stroke-width="2"/>
+    <!-- Left Floating Pastel DNA Helix -->
+    <g transform="translate(38,440) rotate(-18)" opacity="0.82" stroke-width="4" stroke-linecap="round" fill="none">
+      <path d="M10,0 Q35,25 10,50 Q-15,75 10,100 Q35,125 10,150" stroke="#f472b6"/>
+      <path d="M30,0 Q5,25 30,50 Q55,75 30,100 Q5,125 30,150" stroke="#38bdf8"/>
+      <line x1="15" y1="15" x2="25" y2="15" stroke="#fbbf24" stroke-width="3"/>
+      <line x1="12" y1="35" x2="28" y2="35" stroke="#34d399" stroke-width="3"/>
+      <line x1="15" y1="65" x2="25" y2="65" stroke="#fbbf24" stroke-width="3"/>
+      <line x1="12" y1="85" x2="28" y2="85" stroke="#f472b6" stroke-width="3"/>
+      <line x1="15" y1="115" x2="25" y2="115" stroke="#34d399" stroke-width="3"/>
+    </g>
+    <!-- Right Floating Molecule -->
+    <g transform="translate(1355,270)" opacity="0.85" stroke="#64748b" stroke-width="3">
+      <line x1="0" y1="0" x2="30" y2="-22"/><line x1="0" y1="0" x2="32" y2="20"/><line x1="0" y1="0" x2="-28" y2="18"/>
+      <circle cx="0" cy="0" r="9" fill="#ff758f" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="30" cy="-22" r="7" fill="#ffd166" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="32" cy="20" r="8" fill="#38bdf8" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="-28" cy="18" r="7" fill="#57cc99" stroke="#1e293b" stroke-width="2"/>
+    </g>
+    <!-- Right Floating Erlenmeyer Flask -->
+    <g transform="translate(1365,540) rotate(12)" opacity="0.85">
+      <path d="M12,0 L28,0 L28,16 L42,46 Q45,52 38,52 L2,52 Q-5,52 -2,46 L12,16 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2.5"/>
+      <path d="M3,36 L37,36 L41,46 Q43,50 37,50 L3,50 Q-3,50 -1,46 Z" fill="#38bdf8"/>
+      <circle cx="18" cy="42" r="3" fill="#fff"/><circle cx="26" cy="30" r="2.5" fill="#38bdf8"/>
+    </g>
+  </svg>
+</div>
 
 <nav>
-  <div>
-    <div class="nav-logo">BiotechOpoly</div>
-    <div class="nav-sub">陳宏霖博士實驗室大富翁</div>
+  <div class="nav-brand">
+    <div class="nav-badge-icon">🧬</div>
+    <div>
+      <div class="nav-logo">陳宏霖老師實驗室導覽</div>
+      <div class="nav-sub">BIOTECH OPOLY · 未來生技研發中心</div>
+    </div>
   </div>
   <div class="nav-sp"></div>
+  <button class="nav-3d-btn" id="toggle-3d-btn" onclick="toggle3DBoard()">🧊 3D立體視角：開</button>
+  <div class="nav-last-roll" id="nav-last-roll"></div>
   <div id="nav-turn"></div>
 </nav>
 
 <div class="wrap">
-<div class="board-scale" id="board-scale">
-<div class="board-wrap">
-<div class="board" id="board">
-  <!-- Squares injected by JS -->
-  <div class="board-center" id="center">
-    <div class="bc-dna">🧬</div>
-    <div class="bc-logo">Biotech<br>Opoly</div>
-    <div class="bc-sub">陳宏霖實驗室大富翁</div>
-    <div class="bc-sub" style="margin-top:4px;color:#f472b6">生物科技大富翁</div>
-    <div id="pl-list" class="pl-list"></div>
-    <div class="dice-area">
-      <div class="dice" id="dice1">🎲</div>
-      <div class="dice" id="dice2">🎲</div>
+  <div class="board-scale" id="board-scale">
+    <div class="board-3d-tilt" id="board-3d-tilt">
+      <div class="board-wrap">
+        <div class="board" id="board">
+          <!-- Squares injected by JS -->
+
+          <!-- CENTER HUB -->
+          <div class="board-center" id="center">
+            <!-- Isometric Lab & Hologram Artwork -->
+            <div class="center-art-layer">
+              <svg viewBox="0 0 740 490" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                  <radialGradient id="pedestalGlow" cx="50%" cy="45%" r="50%">
+                    <stop offset="0%" stop-color="#00f5d4" stop-opacity="0.55"/>
+                    <stop offset="55%" stop-color="#00bbf9" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#00bbf9" stop-opacity="0"/>
+                  </radialGradient>
+                  <linearGradient id="platGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#90e0ef"/>
+                    <stop offset="50%" stop-color="#48cae4"/>
+                    <stop offset="100%" stop-color="#0077b6"/>
+                  </linearGradient>
+                </defs>
+
+                <g stroke="#38bdf8" stroke-opacity="0.16" stroke-width="1.5">
+                  <line x1="370" y1="250" x2="0" y2="490"/>
+                  <line x1="370" y1="250" x2="740" y2="490"/>
+                  <line x1="370" y1="250" x2="0" y2="340"/>
+                  <line x1="370" y1="250" x2="740" y2="340"/>
+                  <ellipse cx="370" cy="295" rx="220" ry="85" fill="none"/>
+                  <ellipse cx="370" cy="295" rx="155" ry="58" fill="none"/>
+                </g>
+
+                <ellipse cx="370" cy="240" rx="185" ry="135" fill="url(#pedestalGlow)"/>
+
+                <!-- Isometric Lab Platform Base -->
+                <g transform="translate(370, 295)">
+                  <polygon points="-165,10 -95,-42 95,-42 165,10 115,68 -115,68" fill="#1e3a8a" stroke="#0b132b" stroke-width="3.5"/>
+                  <polygon points="-155,4 -90,-44 90,-44 155,4 108,58 -108,58" fill="url(#platGrad)" stroke="#0b132b" stroke-width="3"/>
+                  <ellipse cx="0" cy="2" rx="76" ry="32" fill="#0b132b" stroke="#72efdd" stroke-width="3"/>
+                  <ellipse cx="0" cy="-6" rx="72" ry="29" fill="#48cae4" stroke="#0b132b" stroke-width="3"/>
+                  <ellipse cx="0" cy="-8" rx="54" ry="21" fill="#90e0ef" stroke="#00f5d4" stroke-width="2.5"/>
+                  <ellipse cx="0" cy="-10" rx="38" ry="14" fill="#e0fbfc"/>
+
+                  <!-- Left Cute Green Cell Mascot on Pedestal -->
+                  <g transform="translate(-78, -42)">
+                    <ellipse cx="0" cy="26" rx="22" ry="9" fill="#0b132b" opacity="0.35"/>
+                    <path d="M-22,2 Q-24,-10 -32,-14" stroke="#2ec4b6" stroke-width="5" stroke-linecap="round" fill="none"/>
+                    <path d="M20,-2 Q30,-14 34,-22" stroke="#2ec4b6" stroke-width="5" stroke-linecap="round" fill="none"/>
+                    <circle cx="0" cy="0" r="23" fill="#57cc99" stroke="#0b132b" stroke-width="3"/>
+                    <circle cx="-7" cy="-6" r="5" fill="#fff" opacity="0.5"/>
+                    <circle cx="-7" cy="-2" r="3" fill="#0b132b"/>
+                    <circle cx="7" cy="-2" r="3" fill="#0b132b"/>
+                    <path d="M-5,5 Q0,11 5,5" fill="#ff4d94" stroke="#0b132b" stroke-width="2"/>
+                    <circle cx="-12" cy="3" r="3.5" fill="#ff758f" opacity="0.7"/>
+                    <circle cx="12" cy="3" r="3.5" fill="#ff758f" opacity="0.7"/>
+                  </g>
+
+                  <!-- Central Giant Glowing DNA Double Helix -->
+                  <g transform="translate(0, -82)">
+                    <path d="M-18,68 Q22,38 -18,8 Q-52,-22 -14,-52 Q22,-78 -14,-102" fill="none" stroke="#ff4d94" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M18,68 Q-22,38 18,8 Q52,-22 14,-52 Q-22,-78 14,-102" fill="none" stroke="#00bbf9" stroke-width="7" stroke-linecap="round"/>
+                    <line x1="-11" y1="54" x2="11" y2="54" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-14" y1="36" x2="14" y2="36" stroke="#72efdd" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-11" y1="18" x2="11" y2="18" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-13" y1="-8" x2="13" y2="-8" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-15" y1="-26" x2="15" y2="-26" stroke="#ff4d94" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-11" y1="-44" x2="11" y2="-44" stroke="#72efdd" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-12" y1="-70" x2="12" y2="-70" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="-10" y1="-88" x2="10" y2="-88" stroke="#ff9f1c" stroke-width="4" stroke-linecap="round"/>
+                  </g>
+
+                  <!-- Right Brain & 3D Protein Hologram -->
+                  <g transform="translate(74, -68)">
+                    <ellipse cx="0" cy="32" rx="28" ry="12" fill="#00bbf9" fill-opacity="0.25" stroke="#72efdd" stroke-width="2"/>
+                    <path d="M-18,-8 C-24,-20 -10,-32 0,-28 C12,-32 24,-20 18,-8 C24,2 14,12 4,10 C-6,14 -22,4 -18,-8 Z" fill="#f472b6" fill-opacity="0.85" stroke="#72efdd" stroke-width="2.5"/>
+                    <path d="M-8,-18 Q0,-12 8,-18 M-10,-6 Q0,-2 10,-8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                  </g>
+
+                  <!-- Front Test Tube Screen & Vials -->
+                  <g transform="translate(0, 32)">
+                    <rect x="-26" y="-18" width="52" height="36" rx="6" fill="#0f172a" stroke="#72efdd" stroke-width="2.5"/>
+                    <rect x="-6" y="-12" width="12" height="24" rx="5" fill="#ff4d94" stroke="#fff" stroke-width="1.5"/>
+                  </g>
+                </g>
+
+                <!-- Left Microscope Illustration -->
+                <g transform="translate(88, 228)">
+                  <ellipse cx="0" cy="36" rx="28" ry="10" fill="#48cae4" stroke="#0b132b" stroke-width="2.5"/>
+                  <path d="M-8,32 L-8,6 Q-8,-16 12,-16 L16,-16" fill="none" stroke="#90e0ef" stroke-width="9" stroke-linecap="round"/>
+                  <path d="M-8,32 L-8,6 Q-8,-16 12,-16 L16,-16" fill="none" stroke="#0b132b" stroke-width="2.5"/>
+                  <rect x="6" y="-32" width="12" height="26" rx="3" transform="rotate(20 12 -20)" fill="#ffd166" stroke="#0b132b" stroke-width="2.5"/>
+                  <line x1="-2" y1="12" x2="22" y2="12" stroke="#0b132b" stroke-width="4" stroke-linecap="round"/>
+                </g>
+
+                <!-- Right Laptop & DNA Hologram -->
+                <g transform="translate(645, 225)">
+                  <polygon points="-32,12 12,-8 42,8 -2,28" fill="#94a3b8" stroke="#0b132b" stroke-width="2.5"/>
+                  <polygon points="-32,12 12,-8 12,-42 -32,-22" fill="#1e293b" stroke="#0b132b" stroke-width="2.5"/>
+                  <polygon points="-27,7 8,-9 8,-36 -27,-20" fill="#38bdf8"/>
+                </g>
+
+                <!-- Gold Biotech Coins -->
+                <g>
+                  <ellipse cx="220" cy="405" rx="14" ry="8" fill="#ff9f1c" stroke="#0b132b" stroke-width="2"/>
+                  <ellipse cx="220" cy="402" rx="14" ry="8" fill="#ffd166" stroke="#0b132b" stroke-width="2"/>
+                  <ellipse cx="495" cy="410" rx="15" ry="9" fill="#ff9f1c" stroke="#0b132b" stroke-width="2"/>
+                  <ellipse cx="495" cy="407" rx="15" ry="9" fill="#ffd166" stroke="#0b132b" stroke-width="2"/>
+                </g>
+              </svg>
+            </div>
+
+            <!-- TOP LAYER: 3D Tilted Title + Dice Console -->
+            <div class="center-top-bar">
+              <div class="iso-title-box">
+                <div class="iso-biotech">BIOTECH</div>
+                <div class="iso-opoly">OPOLY</div>
+                <div class="iso-sub">（陳宏霖老師實驗室導覽）</div>
+              </div>
+
+              <!-- Interactive 3D Dice & Result Console -->
+              <div class="center-dice-console">
+                <div class="console-top-row">
+                  <div class="die-wrap">
+                    <div class="dice" id="dice1" data-val="6"></div>
+                    <div class="die-num-tag" id="die1-num">6 點</div>
+                  </div>
+                  <div class="dice-plus">+</div>
+                  <div class="die-wrap">
+                    <div class="dice" id="dice2" data-val="6"></div>
+                    <div class="die-num-tag" id="die2-num">6 點</div>
+                  </div>
+                </div>
+                <div class="dice-result" id="dice-result">
+                  🎲 點擊下方擲骰子，點數將顯示於此
+                </div>
+                <div class="console-btns">
+                  <button id="roll-btn" onclick="doRoll()" disabled>🎲 擲骰子</button>
+                  <button id="join-btn" onclick="openJoin()">🔬 加入實驗室</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTTOM LAYER: 3D Card Decks (機會 & 命運) + Lab Title & Players -->
+            <div class="center-bottom-bar">
+              <div class="card-deck-3d chance-deck" onclick="previewDeck('chance')" title="點擊預覽「機會 · 創新靈感」牌組">
+                <div class="deck-tag">機會</div>
+                <div class="deck-icon">❓</div>
+                <div class="deck-sub">創新靈感<br>(Discovery)</div>
+              </div>
+
+              <div class="center-mid-footer">
+                <div id="pl-list" class="pl-list">
+                  <div class="pl-empty">👆 點擊「加入實驗室」召喚會走路的小人開始遊戲！</div>
+                </div>
+                <div class="lab-center-title">✨ 陳宏霖老師實驗室導覽 · 未來生技研發中心 ✨</div>
+              </div>
+
+              <div class="card-deck-3d grant-deck" onclick="previewDeck('grant')" title="點擊預覽「命運 · 研究經費」牌組">
+                <div class="deck-tag">命運</div>
+                <div class="deck-icon">💡</div>
+                <div class="deck-sub">研究經費<br>(Grant)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3D WALKING CHARACTERS OVERLAY LAYER -->
+          <div class="walkers-layer" id="walkers-layer"></div>
+        </div>
+      </div>
     </div>
-    <div class="dice-result" id="dice-result"></div>
-    <button id="roll-btn" onclick="doRoll()" disabled>🎲 擲骰子</button>
-    <button id="join-btn" onclick="openJoin()">🔬 加入實驗室</button>
   </div>
-</div>
-</div>
 </div>
 
 <!-- JOIN MODAL -->
 <div class="modal-bg hidden" id="join-modal">
-<div class="modal">
-  <button class="modal-close" onclick="closeModal('join-modal')">✕</button>
-  <h2>🔬 加入實驗室</h2>
-  <p>選擇你的研究員頭像、顏色，並輸入你的名字！</p>
-  <div class="avatar-row">
-    <div class="avatar-btn on" id="av-m" onclick="pickAv('m')">👨‍🔬</div>
-    <div class="avatar-btn" id="av-f" onclick="pickAv('f')">👩‍🔬</div>
-    <div class="avatar-btn" id="av-r" onclick="pickAv('r')">🤖</div>
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('join-modal')">✕</button>
+    <h2>🔬 加入陳宏霖實驗室</h2>
+    <p>選擇你的 3D 實驗室小人造型、代表顏色，並輸入名字踏上生技研發之旅！</p>
+    <div class="avatar-row">
+      <div class="avatar-btn on" id="av-m" onclick="pickAv('m')">
+        <div id="preview-av-m"></div>
+        <span>男研究員</span>
+      </div>
+      <div class="avatar-btn" id="av-f" onclick="pickAv('f')">
+        <div id="preview-av-f"></div>
+        <span>女研究員</span>
+      </div>
+      <div class="avatar-btn" id="av-r" onclick="pickAv('r')">
+        <div id="preview-av-r"></div>
+        <span>AI機器人</span>
+      </div>
+    </div>
+    <div class="color-row" id="color-row"></div>
+    <input class="name-inp" id="player-name" placeholder="輸入你的名字（例如：研究員小明）…" maxlength="10" onkeydown="if(event.key==='Enter')joinGame()">
+    <button class="modal-btn primary" onclick="joinGame()">🚀 召喚小人進入棋盤</button>
   </div>
-  <div class="color-row" id="color-row"></div>
-  <input class="name-inp" id="player-name" placeholder="輸入你的名字…" maxlength="10">
-  <button class="modal-btn primary" onclick="joinGame()">✅ 加入棋盤</button>
-</div>
 </div>
 
 <!-- SQUARE INFO MODAL -->
 <div class="modal-bg hidden" id="sq-modal">
-<div class="modal">
-  <button class="modal-close" onclick="closeModal('sq-modal')">✕</button>
-  <div id="sq-modal-content"></div>
-</div>
+  <div class="modal">
+    <button class="modal-close" onclick="closeSqModal()">✕</button>
+    <div id="sq-modal-content"></div>
+    <button class="modal-btn primary" id="sq-modal-ok" style="margin-top:16px" onclick="closeSqModal()">關閉視窗</button>
+  </div>
 </div>
 
 <!-- CARD MODAL -->
 <div class="modal-bg hidden" id="card-modal">
-<div class="modal" style="text-align:center">
-  <button class="modal-close" onclick="closeModal('card-modal')">✕</button>
-  <div id="card-modal-content"></div>
-  <button class="modal-btn primary" style="margin-top:16px" onclick="applyCard()">確認</button>
-</div>
+  <div class="modal" style="text-align:center">
+    <button class="modal-close" onclick="applyCard()">✕</button>
+    <div id="card-modal-content"></div>
+    <button class="modal-btn primary" style="margin-top:16px" onclick="applyCard()">確認執行</button>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -281,18 +1136,116 @@ nav{height:48px;background:#0a0f28cc;backdrop-filter:blur(10px);
 <script>
 // ── DATA ──────────────────────────────────────────────────────
 const AVATARS={m:'👨‍🔬',f:'👩‍🔬',r:'🤖'};
-const COLORS=['#f472b6','#60a5fa','#4ade80','#fbbf24','#c084fc','#fb923c'];
-const TOKEN_EMOJIS=['🔴','🔵','🟢','🟡','🟣','🟠'];
+const COLORS=['#ff4d94','#3a86ff','#2ec4b6','#ff9f1c','#9b5de5','#57cc99'];
+
+const PIP_MAP={
+  1:[4],
+  2:[2,6],
+  3:[2,4,6],
+  4:[0,2,6,8],
+  5:[0,2,4,6,8],
+  6:[0,2,3,5,6,8]
+};
+
+// ── ARTICULATED WALKING CHARACTER SVG BUILDER ─────────────────
+function buildCharacterSVG(av, color){
+  if(av === 'r'){
+    // Cute Articulated AI Biotech Robot
+    return `<svg class="walker-svg" viewBox="0 0 52 64">
+      <ellipse class="ch-shadow" cx="26" cy="59" rx="14" ry="5" fill="#0b132b" opacity="0.45"/>
+      <g class="ch-body-group">
+        <!-- Back Arm -->
+        <g class="ch-arm-l">
+          <rect x="12" y="29" width="6" height="15" rx="3" fill="#94a3b8" stroke="#0b132b" stroke-width="2"/>
+          <circle cx="15" cy="44" r="3" fill="${color}" stroke="#0b132b" stroke-width="1.8"/>
+        </g>
+        <!-- Left Leg -->
+        <g class="ch-leg-l">
+          <rect x="18" y="44" width="6.5" height="13" rx="3" fill="#64748b" stroke="#0b132b" stroke-width="2"/>
+          <ellipse cx="21" cy="57" rx="5" ry="2.8" fill="${color}" stroke="#0b132b" stroke-width="1.8"/>
+        </g>
+        <!-- Right Leg -->
+        <g class="ch-leg-r">
+          <rect x="27.5" y="44" width="6.5" height="13" rx="3" fill="#64748b" stroke="#0b132b" stroke-width="2"/>
+          <ellipse cx="31" cy="57" rx="5" ry="2.8" fill="${color}" stroke="#0b132b" stroke-width="1.8"/>
+        </g>
+        <!-- Robot Torso -->
+        <rect x="16" y="27" width="20" height="19" rx="5" fill="#e2e8f0" stroke="#0b132b" stroke-width="2.2"/>
+        <rect x="20" y="31" width="12" height="9" rx="2.5" fill="${color}" stroke="#0b132b" stroke-width="1.6"/>
+        <!-- Robot Head & Antenna -->
+        <line x1="26" y1="4" x2="26" y2="10" stroke="#0b132b" stroke-width="2.5"/>
+        <circle cx="26" cy="4" r="3.2" fill="${color}" stroke="#0b132b" stroke-width="1.8"/>
+        <rect x="13" y="9" width="26" height="18" rx="6" fill="#f8fafc" stroke="#0b132b" stroke-width="2.2"/>
+        <rect x="17" y="13" width="18" height="10" rx="3.5" fill="#0f172a"/>
+        <circle cx="22" cy="18" r="2.3" fill="#72efdd"/>
+        <circle cx="30" cy="18" r="2.3" fill="#72efdd"/>
+        <!-- Front Arm -->
+        <g class="ch-arm-r">
+          <rect x="34" y="29" width="6" height="15" rx="3" fill="#cbd5e1" stroke="#0b132b" stroke-width="2"/>
+          <circle cx="37" cy="44" r="3" fill="${color}" stroke="#0b132b" stroke-width="1.8"/>
+        </g>
+      </g>
+    </svg>`;
+  }
+
+  const isFemale = (av === 'f');
+  return `<svg class="walker-svg" viewBox="0 0 52 64">
+    <ellipse class="ch-shadow" cx="26" cy="59" rx="14" ry="5" fill="#0b132b" opacity="0.45"/>
+    <g class="ch-body-group">
+      <!-- Back Arm (Left) -->
+      <g class="ch-arm-l">
+        <rect x="12" y="29" width="6.5" height="15" rx="3.2" fill="#ffffff" stroke="#0b132b" stroke-width="2"/>
+        <circle cx="15.2" cy="44" r="3" fill="#ffcdb2" stroke="#0b132b" stroke-width="1.8"/>
+      </g>
+      <!-- Left Leg -->
+      <g class="ch-leg-l">
+        <rect x="18.5" y="43" width="6.5" height="14" rx="3" fill="${color}" stroke="#0b132b" stroke-width="2"/>
+        <ellipse cx="22" cy="57" rx="5" ry="2.6" fill="#1e293b" stroke="#0b132b" stroke-width="1.8"/>
+      </g>
+      <!-- Right Leg -->
+      <g class="ch-leg-r">
+        <rect x="27" y="43" width="6.5" height="14" rx="3" fill="${color}" stroke="#0b132b" stroke-width="2"/>
+        <ellipse cx="30.5" cy="57" rx="5" ry="2.6" fill="#1e293b" stroke="#0b132b" stroke-width="1.8"/>
+      </g>
+      <!-- Scientist Lab Coat & Coloured Shirt Torso -->
+      <path d="M16,27 L36,27 L38,46 L14,46 Z" fill="#ffffff" stroke="#0b132b" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- Inner Team-Color Tie / Shirt Strip -->
+      <polygon points="23,27 29,27 28,43 24,43" fill="${color}" stroke="#0b132b" stroke-width="1.4"/>
+      <!-- Lab Coat Lapels -->
+      <path d="M21,27 L25,36 M31,27 L27,36" stroke="#0b132b" stroke-width="1.6" stroke-linecap="round"/>
+      <!-- Ponytail for Female Scientist -->
+      ${isFemale ? `<path d="M14,15 Q6,17 8,26 Q12,25 15,20" fill="#582f0e" stroke="#0b132b" stroke-width="2"/>` : ''}
+      <!-- Head -->
+      <circle cx="26" cy="16" r="11" fill="#ffcdb2" stroke="#0b132b" stroke-width="2.2"/>
+      <!-- Hair -->
+      ${isFemale
+        ? `<path d="M15,15 C15,6 37,6 37,15 C34,11 28,10 15,15 Z" fill="#582f0e" stroke="#0b132b" stroke-width="2"/>`
+        : `<path d="M15,14 C15,5 37,5 37,14 L35,10 L31,12 L27,8 L22,12 L17,10 Z" fill="#2b2d42" stroke="#0b132b" stroke-width="2" stroke-linejoin="round"/>`
+      }
+      <!-- Lab Goggles / Glasses -->
+      <rect x="18" y="13" width="7.5" height="5.5" rx="2" fill="rgba(114,239,221,0.55)" stroke="#0b132b" stroke-width="1.8"/>
+      <rect x="27.5" y="13" width="7.5" height="5.5" rx="2" fill="rgba(114,239,221,0.55)" stroke="#0b132b" stroke-width="1.8"/>
+      <line x1="25.5" y1="15.5" x2="27.5" y2="15.5" stroke="#0b132b" stroke-width="1.8"/>
+      <!-- Eyes & Smile -->
+      <circle cx="22" cy="15.8" r="1.3" fill="#0b132b"/>
+      <circle cx="31" cy="15.8" r="1.3" fill="#0b132b"/>
+      <path d="M24,21.5 Q26.5,24 29,21.5" fill="none" stroke="#0b132b" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Front Arm holding Test Tube (Right) -->
+      <g class="ch-arm-r">
+        <rect x="33.5" y="29" width="6.5" height="15" rx="3.2" fill="#ffffff" stroke="#0b132b" stroke-width="2"/>
+        <circle cx="36.8" cy="44" r="3" fill="#ffcdb2" stroke="#0b132b" stroke-width="1.8"/>
+        <rect x="38" y="36" width="4" height="10" rx="2" fill="${color}" stroke="#0b132b" stroke-width="1.4"/>
+      </g>
+    </g>
+  </svg>`;
+}
 
 // 28 squares (0=START corner, counter-clockwise)
 const SQ=[
-// 0: START (bottom-right)
-{id:0,type:'start',name:'啟動研究！',en:'BOOT UP',emoji:'🚀',bg:'sq-bg-corner',
+{id:0,type:'start',name:'- START - 啟動研究！',en:'(BOOT UP)',emoji:'🚀',
  desc:'歡迎加入陳宏霖博士實驗室！生物科技改變世界，從這裡出發！每次經過起點，代表你越來越熟悉實驗室了。',
  learn:[]},
-
-// Bottom row (right→left): 1-6
-{id:1,type:'research',name:'基因體學',en:'Genomics',emoji:'🧬',color:'#60a5fa',bg:'sq-bg-blue',
+{id:1,type:'research',name:'基因體學',en:'(Genomics)',emoji:'🧬',color:'#ff9f1c',
  desc:'研究人類與微生物的完整基因組，利用次世代定序（NGS）探索疾病相關遺傳變異與基因調控網路。',
  learn:[
    {icon:'💻',text:'Python/R程式設計：序列分析、基因組組裝與注釋'},
@@ -300,7 +1253,7 @@ const SQ=[
    {icon:'🔬',text:'分子生物學：DNA提取、文庫製備、NGS定序流程'},
    {icon:'🗂️',text:'生物資料庫：NCBI、Ensembl、UCSC Genome Browser操作'},
  ]},
-{id:2,type:'research',name:'微生物基因體',en:'Metagenomics',emoji:'🦠',color:'#60a5fa',bg:'sq-bg-blue',
+{id:2,type:'research',name:'微生物基因體',en:'(Metagenomics)',emoji:'🦠',color:'#ff4d94',
  desc:'分析腸道菌群、環境微生物組的多樣性與功能，探索微生物組與慢性病、免疫調節的關聯。',
  learn:[
    {icon:'🧫',text:'微生物學基礎：細菌分類、16S rRNA基因定序原理'},
@@ -308,9 +1261,9 @@ const SQ=[
    {icon:'📊',text:'多樣性分析：Alpha/Beta多樣性指數、PCoA排序'},
    {icon:'🔗',text:'功能注釋：COG、KEGG通路分析、共現網絡建構'},
  ]},
-{id:3,type:'chance',name:'機會！',en:'Discovery',emoji:'🎰',color:'#fb923c',bg:'sq-bg-chance',
+{id:3,type:'chance',name:'機會！',en:'(Discovery)',emoji:'❓',color:'#00bbf9',
  desc:'抽一張「創新靈感」卡，看看你的研究有什麼意外收穫！',learn:[]},
-{id:4,type:'research',name:'代謝體學',en:'Metabolomics',emoji:'⚗️',color:'#4ade80',bg:'sq-bg-green',
+{id:4,type:'research',name:'代謝體學',en:'(Metabolomics)',emoji:'⚗️',color:'#ff4d94',
  desc:'利用質譜與核磁共振技術全面鑑定細胞與體液中的代謝物，揭示疾病代謝標記與藥物作用機制。',
  learn:[
    {icon:'⚗️',text:'質譜技術：LC-MS/MS、GC-MS、NMR分析原理與操作'},
@@ -318,7 +1271,7 @@ const SQ=[
    {icon:'🧪',text:'樣品前處理：蛋白質沉澱、固相萃取、衍生化方法'},
    {icon:'📊',text:'多變量統計：PCA、OPLS-DA、代謝通路富集分析'},
  ]},
-{id:5,type:'research',name:'醣科學',en:'Glycoscience',emoji:'🍬',color:'#4ade80',bg:'sq-bg-green',
+{id:5,type:'research',name:'醣科學',en:'(Glycoscience)',emoji:'🍬',color:'#ffd166',
  desc:'研究多醣與醣蛋白的結構與生物功能，探索醣鏈在細胞辨識、信號傳導與免疫調節中的核心角色。',
  learn:[
    {icon:'🔬',text:'醣化學：單醣結構、醣苷鍵類型、聚醣生物合成途徑'},
@@ -326,7 +1279,7 @@ const SQ=[
    {icon:'🧬',text:'酵素學：醣基轉移酶、醣苷酶的活性測定與抑制劑設計'},
    {icon:'💻',text:'醣體資料庫：GlyTouCan、GlycoMod、CFG Glycan Array'},
  ]},
-{id:6,type:'research',name:'AI製藥',en:'AI Drug Discovery',emoji:'🤖',color:'#c084fc',bg:'sq-bg-purple',
+{id:6,type:'research',name:'AI製藥',en:'(AI Drug Discovery)',emoji:'🤖',color:'#57cc99',
  desc:'利用深度學習與圖神經網路預測藥物-靶標交互作用，大幅加速候選藥物篩選與最佳化流程。',
  learn:[
    {icon:'🤖',text:'深度學習：PyTorch/TensorFlow框架、圖神經網路（GNN）'},
@@ -334,13 +1287,9 @@ const SQ=[
    {icon:'💻',text:'工具鏈：AutoDock Vina、DeepChem、RDKit、Schrödinger'},
    {icon:'📊',text:'模型評估：AUC-ROC、富集因子（EF）、交叉驗證策略'},
  ]},
-
-// 7: JAIL corner (bottom-left)
-{id:7,type:'jail',name:'隔離觀察室',en:'Bio-Containment',emoji:'🔒',bg:'sq-bg-corner',
+{id:7,type:'jail',name:'隔離觀察室',en:'(Bio-Containment Zone)',emoji:'🔒',
  desc:'在生物安全二級隔離區觀察等待。暫停一回合，讓污染源清除後再繼續研究。',learn:[]},
-
-// Left column (bottom→top): 8-13
-{id:8,type:'research',name:'高速藥物篩選',en:'High-Throughput Screening',emoji:'🔭',color:'#f472b6',bg:'sq-bg-pink',
+{id:8,type:'research',name:'高速藥物篩選',en:'(High-Throughput)',emoji:'🔭',color:'#ff9f1c',
  desc:'利用自動化機器人平台在數天內篩選數萬至數百萬個化合物，快速鎖定具活性的先導化合物（Hit）。',
  learn:[
    {icon:'🤖',text:'自動化系統：液體處理機器人（Hamilton、Tecan）操作'},
@@ -348,9 +1297,9 @@ const SQ=[
    {icon:'📊',text:'數據分析：Z因子計算、劑量反應曲線擬合（Hill方程）'},
    {icon:'💊',text:'化合物庫管理：DMSO儲存、濃度校正、命中確認策略'},
  ]},
-{id:9,type:'grant',name:'命運！',en:'Grant',emoji:'🏆',color:'#fbbf24',bg:'sq-bg-grant',
+{id:9,type:'grant',name:'命運！',en:'(Grant)',emoji:'💡',color:'#ffd166',
  desc:'抽一張「研究經費」卡，看看你的計畫獲得什麼資助！',learn:[]},
-{id:10,type:'research',name:'3D結構設計',en:'3D Molecular Design',emoji:'🔮',color:'#c084fc',bg:'sq-bg-purple',
+{id:10,type:'research',name:'3D結構設計',en:'(3D Modeling)',emoji:'🔮',color:'#3a86ff',
  desc:'運用AlphaFold與分子動力學模擬預測蛋白質三維結構，結合分子對接設計新型藥物靶點。',
  learn:[
    {icon:'🔮',text:'蛋白質結構：二級、三級、四級結構與結構資料庫（PDB）'},
@@ -358,7 +1307,7 @@ const SQ=[
    {icon:'⚗️',text:'分子動力學：GROMACS、AMBER力場設定與軌跡分析'},
    {icon:'🎨',text:'視覺化工具：PyMOL、UCSF ChimeraX、VMD'},
  ]},
-{id:11,type:'research',name:'跨領域研究',en:'Interdisciplinary',emoji:'🌐',color:'#c084fc',bg:'sq-bg-purple',
+{id:11,type:'research',name:'跨領域研究',en:'(Interdisciplinary)',emoji:'🌐',color:'#9b5de5',
  desc:'打破學科藩籬，整合生物、化學、工程、資訊、臨床醫學，以系統觀點解決複雜生醫問題。',
  learn:[
    {icon:'📊',text:'多組學整合：MOFA+、DIABLO、Seurat多模態分析'},
@@ -366,37 +1315,7 @@ const SQ=[
    {icon:'💻',text:'單細胞分析：scRNA-seq細胞類型鑑定、軌跡推斷'},
    {icon:'🧠',text:'系統生物學：從分子到細胞到個體的多尺度建模'},
  ]},
-{id:12,type:'research',name:'罕見疾病',en:'Rare Diseases',emoji:'🌟',color:'#f472b6',bg:'sq-bg-pink',
- desc:'針對患者人數稀少、缺乏有效治療的罕見疾病，從基因診斷到孤兒藥研發，每一份努力都深具意義。',
- learn:[
-   {icon:'🧬',text:'基因診斷：全外顯子組定序（WES）、全基因組定序（WGS）'},
-   {icon:'🏥',text:'臨床研究：孤兒藥指定申請、適應性臨床試驗設計'},
-   {icon:'🐭',text:'疾病模型：基因改造小鼠、患者誘導多能幹細胞（iPSC）'},
-   {icon:'🤝',text:'病患組織合作：自然病史研究、患者登記系統建立'},
- ]},
-{id:13,type:'research',name:'多體學',en:'Multi-Omics',emoji:'🌌',color:'#fbbf24',bg:'sq-bg-yellow',
- desc:'同時整合基因組、轉錄組、蛋白質組、代謝組和醣組學數據，系統性解析疾病的分子機制。',
- learn:[
-   {icon:'📊',text:'組學整合框架：MOFA+、mixOmics、iCluster+方法比較'},
-   {icon:'💻',text:'降維視覺化：UMAP、t-SNE在多組學數據的應用'},
-   {icon:'🔗',text:'因果推斷：孟德爾隨機化（MR）、貝氏網絡建構'},
-   {icon:'📈',text:'縱向研究：時間序列多組學設計、動態網絡分析'},
- ]},
-
-// 14: FREE PARKING (top-left)
-{id:14,type:'free',name:'休息區',en:'Free Parking',emoji:'☕',bg:'sq-bg-corner',
- desc:'喘息一下！享受免費咖啡與同儕交流，充電後精神飽滿繼續研究。',learn:[]},
-
-// Top row (left→right): 15-20
-{id:15,type:'research',name:'生物科技',en:'Biotechnology',emoji:'🌱',color:'#fb923c',bg:'sq-bg-orange',
- desc:'生物科技是結合生命科學與工程技術的整合學門，從基礎研究到產業應用，驅動醫療、農業與環境的革命性變革。',
- learn:[
-   {icon:'🔬',text:'基礎生物學：細胞、分子生物學、遺傳學、生物化學'},
-   {icon:'🏭',text:'生物製程：發酵工程、純化技術、品質管控（GMP）'},
-   {icon:'📋',text:'法規與倫理：研究倫理、生物安全、智慧財產權'},
-   {icon:'💡',text:'創新創業：技術移轉、生技新藥開發流程、SBIR申請'},
- ]},
-{id:16,type:'research',name:'分子生物學',en:'Molecular Biology',emoji:'🔬',color:'#60a5fa',bg:'sq-bg-blue',
+{id:12,type:'research',name:'分子生物學',en:'(Molecular Biology)',emoji:'🔬',color:'#57cc99',
  desc:'掌握DNA複製、RNA轉錄、蛋白質翻譯的中心法則，並應用於基因表達調控與基因工程研究。',
  learn:[
    {icon:'🔬',text:'核心技術：PCR、qPCR、Western Blot、免疫沉澱（IP）'},
@@ -404,9 +1323,7 @@ const SQ=[
    {icon:'🧫',text:'細胞實驗：質體轉染、慢病毒感染、藥物處理時程設計'},
    {icon:'📊',text:'結果分析：ImageJ影像定量、統計檢定、重複性評估'},
  ]},
-{id:17,type:'chance',name:'機會！',en:'Discovery',emoji:'🎰',color:'#fb923c',bg:'sq-bg-chance',
- desc:'抽一張「創新靈感」卡！',learn:[]},
-{id:18,type:'research',name:'基礎細胞生物',en:'Cell Biology',emoji:'🦠',color:'#60a5fa',bg:'sq-bg-blue',
+{id:13,type:'research',name:'基礎細胞生物學',en:'(Cell Biology)',emoji:'🦠',color:'#ff4d94',
  desc:'研究細胞的結構組成、信號傳導途徑與細胞週期調控，是所有生醫研究的核心基礎。',
  learn:[
    {icon:'🧫',text:'細胞培養：無菌技術、傳代、凍存/解凍、污染排除'},
@@ -414,7 +1331,35 @@ const SQ=[
    {icon:'📊',text:'細胞功能：MTT存活率、流式細胞凋亡/細胞週期分析'},
    {icon:'🧬',text:'信號傳導：受體活化、激酶磷酸化、轉錄因子調控'},
  ]},
-{id:19,type:'research',name:'免疫學',en:'Immunology',emoji:'🛡️',color:'#fbbf24',bg:'sq-bg-yellow',
+{id:14,type:'free',name:'午茶與跨界交流！',en:'(Coffee & Brainstorm)',emoji:'☕',
+ desc:'喘息一下！科學家、AI機器人與細胞夥伴一起喝咖啡激盪跨界研究靈感，充電後精神飽滿繼續研究。',learn:[]},
+{id:15,type:'research',name:'生物科技',en:'(Biotechnology)',emoji:'🌱',color:'#57cc99',
+ desc:'生物科技是結合生命科學與工程技術的整合學門，從基礎研究到產業應用，驅動醫療、農業與環境的革命性變革。',
+ learn:[
+   {icon:'🔬',text:'基礎生物學：細胞、分子生物學、遺傳學、生物化學'},
+   {icon:'🏭',text:'生物製程：發酵工程、純化技術、品質管控（GMP）'},
+   {icon:'📋',text:'法規與倫理：研究倫理、生物安全、智慧財產權'},
+   {icon:'💡',text:'創新創業：技術移轉、生技新藥開發流程、SBIR申請'},
+ ]},
+{id:16,type:'research',name:'多體學',en:'(Multi-Omics)',emoji:'🌌',color:'#ffd166',
+ desc:'同時整合基因組、轉錄組、蛋白質組、代謝組和醣組學數據，系統性解析疾病的分子機制。',
+ learn:[
+   {icon:'📊',text:'組學整合框架：MOFA+、mixOmics、iCluster+方法比較'},
+   {icon:'💻',text:'降維視覺化：UMAP、t-SNE在多組學數據的應用'},
+   {icon:'🔗',text:'因果推斷：孟德爾隨機化（MR）、貝氏網絡建構'},
+   {icon:'📈',text:'縱向研究：時間序列多組學設計、動態網絡分析'},
+ ]},
+{id:17,type:'chance',name:'機會！',en:'(Discovery)',emoji:'❓',color:'#00bbf9',
+ desc:'抽一張「創新靈感」卡！',learn:[]},
+{id:18,type:'research',name:'罕見疾病',en:'(Rare Diseases)',emoji:'🌟',color:'#ff4d94',
+ desc:'針對患者人數稀少、缺乏有效治療的罕見疾病，從基因診斷到孤兒藥研發，每一份努力都深具意義。',
+ learn:[
+   {icon:'🧬',text:'基因診斷：全外顯子組定序（WES）、全基因組定序（WGS）'},
+   {icon:'🏥',text:'臨床研究：孤兒藥指定申請、適應性臨床試驗設計'},
+   {icon:'🐭',text:'疾病模型：基因改造小鼠、患者誘導多能幹細胞（iPSC）'},
+   {icon:'🤝',text:'病患組織合作：自然病史研究、患者登記系統建立'},
+ ]},
+{id:19,type:'research',name:'免疫科學',en:'(Immunology)',emoji:'🛡️',color:'#ff4d94',
  desc:'研究先天與適應性免疫細胞的活化機制、細胞激素調控網絡，探索自體免疫、腫瘤免疫等疾病的治療策略。',
  learn:[
    {icon:'🔬',text:'免疫學基礎：T細胞/B細胞亞群、NK細胞、巨噬細胞功能'},
@@ -422,7 +1367,7 @@ const SQ=[
    {icon:'🧫',text:'細胞功能：PBMC分離、混合淋巴球反應、T細胞殺傷試驗'},
    {icon:'💻',text:'免疫數據分析：CyTOF質譜流式、scRNA-seq免疫細胞鑑定'},
  ]},
-{id:20,type:'research',name:'醣基分析',en:'Glycan Analysis',emoji:'🔍',color:'#4ade80',bg:'sq-bg-green',
+{id:20,type:'research',name:'醣基分析',en:'(Glycan Analysis)',emoji:'🔍',color:'#ff9f1c',
  desc:'運用質譜、HPLC、凝集素陣列等技術深入解析醣蛋白的醣基化圖譜，揭示醣鏈異常與疾病的關聯。',
  learn:[
    {icon:'⚗️',text:'醣鏈釋放：PNGase F酵素解離N-醣、β消除釋放O-醣'},
@@ -430,13 +1375,9 @@ const SQ=[
    {icon:'🔬',text:'凝集素技術：凝集素陣列、凝集素印跡（Lectin Blot）'},
    {icon:'🗂️',text:'資料庫與工具：GlycoWorkbench、Byonic、UniCarbKB'},
  ]},
-
-// 21: GO TO JAIL (top-right)
-{id:21,type:'goJail',name:'污染警報！',en:'Go to Isolation',emoji:'⚠️',bg:'sq-bg-corner',
+{id:21,type:'goJail',name:'污染警報！送去隔離',en:'(Contamination! Go to Isolation)',emoji:'⚠️',
  desc:'實驗室發生汙染事件！立刻前往隔離觀察室（格7），暫停一輪讓環境徹底淨化。',learn:[]},
-
-// Right column (top→bottom): 22-27
-{id:22,type:'research',name:'蛋白質體學',en:'Proteomics',emoji:'🧩',color:'#2dd4bf',bg:'sq-bg-teal',
+{id:22,type:'research',name:'蛋白質體學',en:'(Proteomics)',emoji:'🧩',color:'#57cc99',
  desc:'利用質譜技術鑑定和定量細胞中數千種蛋白質，探索蛋白質表達、修飾與交互作用網絡。',
  learn:[
    {icon:'⚗️',text:'質譜技術：底部上質譜法（BUP）、iTRAQ/TMT定量蛋白質體學'},
@@ -444,9 +1385,9 @@ const SQ=[
    {icon:'🔬',text:'蛋白質電泳：SDS-PAGE、2D-DIGE差異凝膠電泳'},
    {icon:'🧬',text:'翻譯後修飾：磷酸化、泛素化、醣基化、乙醯化分析'},
  ]},
-{id:23,type:'grant',name:'命運！',en:'Grant',emoji:'🏆',color:'#fbbf24',bg:'sq-bg-grant',
+{id:23,type:'grant',name:'命運！',en:'(Grant)',emoji:'💡',color:'#ffd166',
  desc:'抽一張「研究經費」卡！',learn:[]},
-{id:24,type:'research',name:'生物資訊學',en:'Bioinformatics',emoji:'💻',color:'#2dd4bf',bg:'sq-bg-teal',
+{id:24,type:'research',name:'生物資訊學',en:'(Bioinformatics)',emoji:'💻',color:'#3a86ff',
  desc:'建立高效演算法與整合資料庫，分析大規模基因組、蛋白質組數據，從海量數據中挖掘疾病新機制。',
  learn:[
    {icon:'💻',text:'程式語言：Python（Biopython、Pandas）、R（Bioconductor）'},
@@ -454,7 +1395,7 @@ const SQ=[
    {icon:'🗂️',text:'資料庫開發：PostgreSQL、Neo4j圖形資料庫、REST API設計'},
    {icon:'📊',text:'機器學習：scikit-learn監督/非監督學習、深度學習模型'},
  ]},
-{id:25,type:'research',name:'臨床轉譯',en:'Clinical Translation',emoji:'🏥',color:'#fb923c',bg:'sq-bg-orange',
+{id:25,type:'research',name:'臨床轉譯',en:'(Clinical Translation)',emoji:'🏥',color:'#ff9f1c',
  desc:'將實驗室的基礎發現轉化為臨床可用的診斷生物標記、治療策略或醫療器材，跨越死亡之谷。',
  learn:[
    {icon:'🏥',text:'臨床試驗設計：IRB申請流程、病患招募策略、GCP規範'},
@@ -462,7 +1403,7 @@ const SQ=[
    {icon:'📋',text:'法規事務：TFDA/FDA 510(k)、PMA申請、IND新藥申請'},
    {icon:'🔬',text:'生物標記驗證：分析方法驗證（AMV）、臨床驗證規範'},
  ]},
-{id:26,type:'research',name:'醣蛋白研究',en:'Glycoprotein',emoji:'🍡',color:'#4ade80',bg:'sq-bg-green',
+{id:26,type:'research',name:'醣蛋白研究',en:'(Glycoprotein)',emoji:'🍡',color:'#2ec4b6',
  desc:'分析醣蛋白的糖基化位點、醣鏈結構及其在疾病（肝癌、肝硬化）診斷與治療監測中的生物標記應用。',
  learn:[
    {icon:'⚗️',text:'醣蛋白分析：AFP-L3岩藻糖基化分析、GPC-3醣型鑑定'},
@@ -470,15 +1411,243 @@ const SQ=[
    {icon:'🔬',text:'醣基化酵素：FUT8、ST6GAL1等轉移酶功能與調控'},
    {icon:'🗂️',text:'資料庫整合：UniCarbKB、GlyConnect、O-GlcNAc資料庫'},
  ]},
-{id:27,type:'research',name:'生醫感測器',en:'Biosensor',emoji:'📡',color:'#2dd4bf',bg:'sq-bg-teal',
- desc:'整合奈米材料與生物辨識分子，開發高靈敏度電化學/光學生物感測器，實現疾病生物標記的即時檢測。',
+{id:27,type:'research',name:'生醫感測器',en:'(Biosensor)',emoji:'📡',color:'#9b5de5',
+ desc:'整合IoT裝置應用與生物辨識分子，開發高靈敏度電化學/光學生物感測器，實現疾病生物標記的即時檢測。',
  learn:[
    {icon:'⚡',text:'電化學方法：循環伏安法（CV）、差分脈衝伏安法（DPV）'},
-   {icon:'🔌',text:'奈米材料：金奈米粒子、碳量子點、MXene電極修飾'},
+   {icon:'🔌',text:'IoT裝置應用：ESP32, Arduino, Raspberry Pi'},
    {icon:'🧪',text:'生物辨識層：抗體、適配子（Aptamer）、分子印跡聚合物'},
    {icon:'📊',text:'性能評估：靈敏度、選擇性、線性範圍、偵測極限（LOD）'},
  ]},
 ];
+
+// ── CUSTOM CUTE VECTOR ARTWORK FOR EACH SQUARE ────────────────
+function getSquareArtSVG(id){
+  switch(id){
+    case 0:
+      return `<svg viewBox="0 0 130 68">
+        <circle cx="34" cy="24" r="17" fill="#ff758f" stroke="#111d38" stroke-width="2.5"/>
+        <circle cx="29" cy="21" r="2.2" fill="#111d38"/><circle cx="39" cy="21" r="2.2" fill="#111d38"/>
+        <path d="M31,26 Q34,30 37,26" fill="none" stroke="#111d38" stroke-width="2" stroke-linecap="round"/>
+        <path d="M78,6 Q96,18 78,30 Q60,42 78,52" fill="none" stroke="#ff4d94" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M94,6 Q76,18 94,30 Q112,42 94,52" fill="none" stroke="#00bbf9" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="81" y1="12" x2="91" y2="12" stroke="#ffd166" stroke-width="2.5"/>
+        <line x1="81" y1="24" x2="91" y2="24" stroke="#57cc99" stroke-width="2.5"/>
+        <line x1="81" y1="36" x2="91" y2="36" stroke="#ffd166" stroke-width="2.5"/>
+        <polygon points="22,56 42,47 42,52 108,52 108,60 42,60 42,65" fill="#ef476f" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 1:
+      return `<svg viewBox="0 0 100 52">
+        <rect x="10" y="6" width="80" height="22" rx="4" fill="#ffe5ec" stroke="#111d38" stroke-width="1.8"/>
+        <text x="16" y="22" font-size="13" font-weight="900" fill="#ef476f" font-family="Outfit">A</text>
+        <text x="34" y="22" font-size="13" font-weight="900" fill="#ff9f1c" font-family="Outfit">T</text>
+        <text x="52" y="22" font-size="13" font-weight="900" fill="#2ec4b6" font-family="Outfit">C</text>
+        <text x="70" y="22" font-size="13" font-weight="900" fill="#3a86ff" font-family="Outfit">G</text>
+        <line x1="34" y1="32" x2="18" y2="47" stroke="#3a86ff" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="44" cy="24" r="14" fill="rgba(144,224,239,0.45)" stroke="#111d38" stroke-width="2.5"/>
+      </svg>`;
+    case 2:
+      return `<svg viewBox="0 0 100 52">
+        <rect x="16" y="14" width="22" height="32" rx="11" fill="#80ed99" stroke="#111d38" stroke-width="2"/>
+        <circle cx="23" cy="25" r="2" fill="#111d38"/><circle cx="31" cy="25" r="2" fill="#111d38"/>
+        <rect x="42" y="10" width="24" height="36" rx="12" fill="#ff8fab" stroke="#111d38" stroke-width="2"/>
+        <circle cx="50" cy="22" r="2" fill="#111d38"/><circle cx="58" cy="22" r="2" fill="#111d38"/>
+        <circle cx="76" cy="34" r="11" fill="#ffb703" stroke="#111d38" stroke-width="2"/>
+        <circle cx="73" cy="32" r="1.8" fill="#111d38"/><circle cx="79" cy="32" r="1.8" fill="#111d38"/>
+      </svg>`;
+    case 3:
+    case 17:
+      return `<svg viewBox="0 0 80 52">
+        <path d="M28,16 C28,6 52,6 52,18 C52,26 40,27 40,35" fill="none" stroke="#111d38" stroke-width="8" stroke-linecap="round"/>
+        <path d="M28,16 C28,6 52,6 52,18 C52,26 40,27 40,35" fill="none" stroke="#00bbf9" stroke-width="4.5" stroke-linecap="round"/>
+        <circle cx="40" cy="45" r="4" fill="#ff9f1c" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 4:
+      return `<svg viewBox="0 0 100 52">
+        <rect x="10" y="34" width="80" height="10" rx="5" fill="#90e0ef" stroke="#111d38" stroke-width="2"/>
+        <circle cx="20" cy="39" r="2.5" fill="#111d38"/><circle cx="50" cy="39" r="2.5" fill="#111d38"/><circle cx="80" cy="39" r="2.5" fill="#111d38"/>
+        <circle cx="26" cy="22" r="9" fill="#ff758f" stroke="#111d38" stroke-width="2"/>
+        <circle cx="52" cy="18" r="8" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <circle cx="76" cy="22" r="9" fill="#57cc99" stroke="#111d38" stroke-width="2"/>
+        <path d="M37,20 L42,20 M62,20 L66,20" stroke="#111d38" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>`;
+    case 5:
+      return `<svg viewBox="0 0 100 52">
+        <g stroke="#111d38" stroke-width="2.2">
+          <line x1="50" y1="46" x2="50" y2="30"/>
+          <line x1="50" y1="30" x2="30" y2="16"/>
+          <line x1="50" y1="30" x2="70" y2="16"/>
+          <line x1="30" y1="16" x2="18" y2="8"/>
+          <line x1="70" y1="16" x2="82" y2="8"/>
+        </g>
+        <rect x="44" y="39" width="12" height="10" rx="2" fill="#3a86ff" stroke="#111d38" stroke-width="2"/>
+        <circle cx="50" cy="28" r="6" fill="#57cc99" stroke="#111d38" stroke-width="2"/>
+        <circle cx="30" cy="16" r="5.5" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <circle cx="70" cy="16" r="5.5" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <polygon points="18,2 24,10 12,10" fill="#ff4d94" stroke="#111d38" stroke-width="1.8"/>
+        <polygon points="82,2 88,10 76,10" fill="#9b5de5" stroke="#111d38" stroke-width="1.8"/>
+      </svg>`;
+    case 6:
+      return `<svg viewBox="0 0 100 52">
+        <rect x="24" y="10" width="36" height="28" rx="8" fill="#a2d2ff" stroke="#111d38" stroke-width="2.2"/>
+        <rect x="30" y="16" width="24" height="14" rx="4" fill="#1d3557"/>
+        <circle cx="37" cy="23" r="2.5" fill="#72efdd"/><circle cx="47" cy="23" r="2.5" fill="#72efdd"/>
+        <g transform="translate(72,28) rotate(-30)">
+          <rect x="-12" y="-6" width="12" height="12" rx="6" fill="#ef476f" stroke="#111d38" stroke-width="2"/>
+          <rect x="0" y="-6" width="12" height="12" rx="6" fill="#fff" stroke="#111d38" stroke-width="2"/>
+        </g>
+      </svg>`;
+    case 7:
+      return `<svg viewBox="0 0 100 60">
+        <circle cx="50" cy="32" r="20" fill="#80ed99" stroke="#111d38" stroke-width="2.5"/>
+        <circle cx="42" cy="28" r="6" fill="#475569" stroke="#111d38" stroke-width="2"/>
+        <circle cx="58" cy="28" r="6" fill="#475569" stroke="#111d38" stroke-width="2"/>
+        <ellipse cx="50" cy="39" rx="7" ry="6" fill="#334155" stroke="#111d38" stroke-width="2"/>
+        <path d="M22,18 Q18,24 22,26 Q26,24 22,18 Z" fill="#00bbf9" stroke="#111d38" stroke-width="1.5"/>
+        <path d="M78,18 Q74,24 78,26 Q82,24 78,18 Z" fill="#00bbf9" stroke="#111d38" stroke-width="1.5"/>
+      </svg>`;
+    case 8:
+      return `<svg viewBox="0 0 100 46">
+        <rect x="16" y="6" width="68" height="10" rx="3" fill="#90e0ef" stroke="#111d38" stroke-width="2"/>
+        <line x1="28" y1="16" x2="28" y2="26" stroke="#111d38" stroke-width="3"/>
+        <line x1="50" y1="16" x2="50" y2="26" stroke="#111d38" stroke-width="3"/>
+        <line x1="72" y1="16" x2="72" y2="26" stroke="#111d38" stroke-width="3"/>
+        <rect x="14" y="30" width="72" height="12" rx="3" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <circle cx="28" cy="36" r="3" fill="#ff4d94"/><circle cx="50" cy="36" r="3" fill="#00bbf9"/><circle cx="72" cy="36" r="3" fill="#57cc99"/>
+      </svg>`;
+    case 9:
+    case 23:
+      return `<svg viewBox="0 0 90 46">
+        <circle cx="45" cy="18" r="12" fill="#ffd166" stroke="#111d38" stroke-width="2.2"/>
+        <rect x="40" y="29" width="10" height="7" rx="2" fill="#94a3b8" stroke="#111d38" stroke-width="2"/>
+        <line x1="24" y1="18" x2="18" y2="18" stroke="#ff9f1c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="66" y1="18" x2="72" y2="18" stroke="#ff9f1c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="30" y1="6" x2="25" y2="2" stroke="#ff9f1c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="60" y1="6" x2="65" y2="2" stroke="#ff9f1c" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`;
+    case 10:
+      return `<svg viewBox="0 0 100 46">
+        <path d="M18,34 C12,18 28,8 34,24 C40,38 52,10 44,6" fill="none" stroke="#ff4d94" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M22,38 C30,22 44,18 48,34" fill="none" stroke="#00bbf9" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="72" cy="18" r="9" fill="#ffcdb2" stroke="#111d38" stroke-width="2"/>
+        <rect x="64" y="14" width="16" height="6" rx="2" fill="#3a86ff" stroke="#111d38" stroke-width="1.8"/>
+        <path d="M60,42 Q72,28 84,42" fill="#fff" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 11:
+      return `<svg viewBox="0 0 100 46">
+        <path d="M24,8 L32,8 L32,16 L40,36 L16,36 L24,16 Z" fill="#72efdd" stroke="#111d38" stroke-width="2"/>
+        <rect x="52" y="10" width="28" height="20" rx="3" fill="#90e0ef" stroke="#111d38" stroke-width="2"/>
+        <line x1="48" y1="32" x2="84" y2="32" stroke="#111d38" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="46" cy="36" r="6" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 12:
+      return `<svg viewBox="0 0 100 46">
+        <path d="M14,38 Q30,10 46,24 Q62,38 74,10" fill="none" stroke="#ff4d94" stroke-width="4" stroke-linecap="round"/>
+        <path d="M14,14 Q30,42 46,24 Q62,8 74,36" fill="none" stroke="#00bbf9" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="76" cy="28" r="11" fill="#ff758f" stroke="#111d38" stroke-width="2"/>
+        <rect x="69" y="23" width="14" height="5" rx="2" fill="#72efdd" stroke="#111d38" stroke-width="1.5"/>
+      </svg>`;
+    case 13:
+      return `<svg viewBox="0 0 100 46">
+        <ellipse cx="36" cy="24" rx="20" ry="16" fill="#72efdd" stroke="#111d38" stroke-width="2"/>
+        <circle cx="30" cy="21" r="2" fill="#111d38"/><circle cx="40" cy="21" r="2" fill="#111d38"/>
+        <path d="M32,27 Q35,31 38,27" fill="none" stroke="#111d38" stroke-width="2"/>
+        <ellipse cx="74" cy="28" rx="13" ry="10" fill="#80ed99" stroke="#111d38" stroke-width="2"/>
+        <ellipse cx="74" cy="28" rx="6" ry="4" fill="#ff758f"/>
+      </svg>`;
+    case 14:
+      return `<svg viewBox="0 0 130 66">
+        <circle cx="26" cy="24" r="10" fill="#ffcdb2" stroke="#111d38" stroke-width="2"/>
+        <path d="M14,54 Q26,36 38,54" fill="#fff" stroke="#111d38" stroke-width="2"/>
+        <rect x="52" y="10" width="24" height="18" rx="5" fill="#90e0ef" stroke="#111d38" stroke-width="2"/>
+        <circle cx="59" cy="19" r="2" fill="#111d38"/><circle cx="69" cy="19" r="2" fill="#111d38"/>
+        <circle cx="102" cy="26" r="13" fill="#ff758f" stroke="#111d38" stroke-width="2"/>
+        <circle cx="98" cy="24" r="2" fill="#111d38"/><circle cx="106" cy="24" r="2" fill="#111d38"/>
+        <ellipse cx="64" cy="46" rx="32" ry="9" fill="#d97706" stroke="#111d38" stroke-width="2"/>
+        <rect x="46" y="36" width="8" height="8" rx="2" fill="#fff" stroke="#111d38" stroke-width="1.6"/>
+        <rect x="72" y="36" width="8" height="8" rx="2" fill="#fff" stroke="#111d38" stroke-width="1.6"/>
+      </svg>`;
+    case 15:
+      return `<svg viewBox="0 0 100 52">
+        <rect x="36" y="8" width="28" height="38" rx="14" fill="#57cc99" stroke="#111d38" stroke-width="2.2"/>
+        <circle cx="45" cy="20" r="2.2" fill="#111d38"/><circle cx="55" cy="20" r="2.2" fill="#111d38"/>
+        <path d="M46,26 Q50,31 54,26" fill="none" stroke="#111d38" stroke-width="2"/>
+        <path d="M36,24 L22,16 M64,24 L78,14" stroke="#57cc99" stroke-width="4" stroke-linecap="round"/>
+      </svg>`;
+    case 16:
+      return `<svg viewBox="0 0 100 52">
+        <circle cx="50" cy="26" r="20" fill="#ff758f" stroke="#111d38" stroke-width="2"/>
+        <circle cx="50" cy="26" r="14" fill="#ffd166" stroke="#111d38" stroke-width="1.8"/>
+        <circle cx="50" cy="26" r="8" fill="#00bbf9" stroke="#111d38" stroke-width="1.8"/>
+        <line x1="50" y1="6" x2="50" y2="46" stroke="#111d38" stroke-width="1.8"/>
+        <line x1="30" y1="26" x2="70" y2="26" stroke="#111d38" stroke-width="1.8"/>
+      </svg>`;
+    case 18:
+      return `<svg viewBox="0 0 100 52">
+        <polygon points="50,4 56,18 72,18 59,28 64,44 50,34 36,44 41,28 28,18 44,18" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <circle cx="50" cy="25" r="6" fill="#ff4d94" stroke="#111d38" stroke-width="1.6"/>
+      </svg>`;
+    case 19:
+      return `<svg viewBox="0 0 100 52">
+        <path d="M32,42 L32,26 L20,14 M32,26 L44,14" fill="none" stroke="#9b5de5" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M68,42 L68,26 L56,14 M68,26 L80,14" fill="none" stroke="#2ec4b6" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="20" cy="14" r="3.5" fill="#ff4d94" stroke="#111d38" stroke-width="1.5"/>
+        <circle cx="44" cy="14" r="3.5" fill="#ffd166" stroke="#111d38" stroke-width="1.5"/>
+        <circle cx="56" cy="14" r="3.5" fill="#ff4d94" stroke="#111d38" stroke-width="1.5"/>
+        <circle cx="80" cy="14" r="3.5" fill="#ffd166" stroke="#111d38" stroke-width="1.5"/>
+      </svg>`;
+    case 20:
+      return `<svg viewBox="0 0 100 52">
+        <line x1="24" y1="26" x2="76" y2="26" stroke="#111d38" stroke-width="2.5"/>
+        <circle cx="26" cy="26" r="6" fill="#57cc99" stroke="#111d38" stroke-width="2"/>
+        <rect x="44" y="20" width="12" height="12" rx="2" fill="#3a86ff" stroke="#111d38" stroke-width="2"/>
+        <polygon points="74,18 82,32 66,32" fill="#ff4d94" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 21:
+      return `<svg viewBox="0 0 130 66">
+        <polygon points="34,12 56,50 12,50" fill="#ffd166" stroke="#111d38" stroke-width="2.5" stroke-linejoin="round"/>
+        <text x="34" y="45" text-anchor="middle" font-size="22" font-weight="900" fill="#111d38">!</text>
+        <rect x="76" y="16" width="28" height="22" rx="5" fill="#90e0ef" stroke="#111d38" stroke-width="2.2"/>
+        <circle cx="84" cy="27" r="2.5" fill="#111d38"/><circle cx="96" cy="27" r="2.5" fill="#111d38"/>
+        <rect x="80" y="40" width="20" height="18" rx="4" fill="#cbd5e1" stroke="#111d38" stroke-width="2"/>
+      </svg>`;
+    case 22:
+      return `<svg viewBox="0 0 100 46">
+        <path d="M22,34 Q30,6 44,26 Q58,44 68,12 Q78,28 84,20" fill="none" stroke="#2ec4b6" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="34" cy="18" r="5" fill="#ff4d94" stroke="#111d38" stroke-width="1.8"/>
+        <circle cx="64" cy="26" r="5" fill="#ffd166" stroke="#111d38" stroke-width="1.8"/>
+      </svg>`;
+    case 24:
+      return `<svg viewBox="0 0 100 46">
+        <rect x="24" y="6" width="52" height="32" rx="4" fill="#1d3557" stroke="#111d38" stroke-width="2.2"/>
+        <line x1="32" y1="15" x2="52" y2="15" stroke="#72efdd" stroke-width="3" stroke-linecap="round"/>
+        <line x1="32" y1="23" x2="66" y2="23" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
+        <line x1="32" y1="31" x2="46" y2="31" stroke="#ff4d94" stroke-width="3" stroke-linecap="round"/>
+      </svg>`;
+    case 25:
+      return `<svg viewBox="0 0 100 46">
+        <rect x="24" y="8" width="28" height="28" rx="6" fill="#fff" stroke="#111d38" stroke-width="2"/>
+        <path d="M38,14 L38,30 M30,22 L46,22" stroke="#ef476f" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M62,24 L68,24 L72,14 L76,32 L80,24 L86,24" fill="none" stroke="#3a86ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+    case 26:
+      return `<svg viewBox="0 0 100 46">
+        <ellipse cx="50" cy="30" rx="22" ry="11" fill="#ff758f" stroke="#111d38" stroke-width="2"/>
+        <line x1="40" y1="20" x2="32" y2="8" stroke="#111d38" stroke-width="2"/>
+        <line x1="60" y1="20" x2="68" y2="8" stroke="#111d38" stroke-width="2"/>
+        <circle cx="32" cy="8" r="5" fill="#ffd166" stroke="#111d38" stroke-width="1.8"/>
+        <circle cx="68" cy="8" r="5" fill="#2ec4b6" stroke="#111d38" stroke-width="1.8"/>
+      </svg>`;
+    case 27:
+      return `<svg viewBox="0 0 100 46">
+        <rect x="30" y="20" width="40" height="18" rx="4" fill="#ffd166" stroke="#111d38" stroke-width="2"/>
+        <path d="M38,14 Q50,4 62,14" fill="none" stroke="#00bbf9" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M43,18 Q50,11 57,18" fill="none" stroke="#ff4d94" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`;
+    default:
+      return '';
+  }
+}
 
 // Discovery cards (機會)
 const CHANCE=[
@@ -487,7 +1656,7 @@ const CHANCE=[
   {title:'試劑用完了⋯',emoji:'😅',desc:'急需訂購新試劑，等待一回合。',effect:'skip',val:1,text:'暫停 1 回合'},
   {title:'合作邀請！🤝',emoji:'🌍',desc:'國際實驗室邀請你加入計畫！',effect:'advance',val:4,text:'前進 4 格'},
   {title:'細胞污染！☣️',emoji:'😱',desc:'培養箱發生黴菌污染，需要處理。',effect:'back',val:2,text:'退後 2 格'},
-  {title:'儀器故障！🔧',emoji:'⚙️',desc:'質譜儀需要維修校正。',effect:'back',val:1,text:'退後 1 格，暫停 1 回合'},
+  {title:'儀器故障！🔧',emoji:'⚙️',desc:'質譜儀需要維修校正。',effect:'back',val:1,text:'退後 1 格'},
 ];
 
 // Grant cards (命運)
@@ -496,7 +1665,7 @@ const GRANT=[
   {title:'論文被退稿⋯📧',emoji:'😔',desc:'審稿人要求大修，退回重做。',effect:'back',val:3,text:'退後 3 格'},
   {title:'獲邀國際演講！✈️',emoji:'🎤',desc:'受邀至國際研討會發表成果！',effect:'advance',val:3,text:'前進 3 格'},
   {title:'設備經費批准！🔬',emoji:'💡',desc:'新儀器採購獲准！',effect:'advance',val:2,text:'前進 2 格'},
-  {title:'學生提前畢業！🎓',emoji:'🎉',desc:'指導的學生順利完成論文答辯！',effect:'advance',val:1,text:'前進 1 格，下回合再骰一次'},
+  {title:'學生提前畢業！🎓',emoji:'🎉',desc:'指導的學生順利完成論文答辯！',effect:'advance',val:1,text:'前進 1 格'},
   {title:'數據分析出錯！💻',emoji:'😰',desc:'程式碼有Bug，需要重新分析。',effect:'back',val:2,text:'退後 2 格'},
 ];
 
@@ -504,10 +1673,51 @@ const GRANT=[
 let players=[], currentPlayer=0, gameStarted=false, diceRolling=false;
 let pendingCard=null;
 let joinAv='m', joinColor=0;
+let modalFromLand=false;
+let lastRollInfo=null;
+let is3DMode=true;
+
+function toggle3DBoard(){
+  is3DMode=!is3DMode;
+  const tiltEl=document.getElementById('board-3d-tilt');
+  const btn=document.getElementById('toggle-3d-btn');
+  tiltEl.classList.toggle('flat-mode', !is3DMode);
+  btn.textContent=is3DMode ? '🧊 3D立體視角：開' : '🗺️ 平面視角：開';
+  scaleBoard();
+}
+
+// ── DICE PIP RENDERER ─────────────────────────────────────────
+function initDiceDOM(){
+  ['dice1','dice2'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.innerHTML='';
+    for(let i=0;i<9;i++){
+      const pip=document.createElement('span');
+      pip.className='pip';
+      el.appendChild(pip);
+    }
+  });
+  setDieFace('dice1', 6, 'die1-num', false);
+  setDieFace('dice2', 6, 'die2-num', false);
+}
+
+function setDieFace(dieId, val, labelId, highlight=true){
+  const el=document.getElementById(dieId);
+  el.setAttribute('data-val', val);
+  const pips=el.querySelectorAll('.pip');
+  const activeIndices=PIP_MAP[val]||[];
+  pips.forEach((p, idx)=>{
+    p.classList.toggle('on', activeIndices.includes(idx));
+  });
+  if(labelId){
+    const lbl=document.getElementById(labelId);
+    lbl.textContent=`${val} 點`;
+    lbl.classList.toggle('highlight', highlight);
+  }
+}
 
 // ── BOARD RENDER ──────────────────────────────────────────────
 const GRID={
-  // [id]: [grid-column, grid-row]
   0:[8,8],1:[7,8],2:[6,8],3:[5,8],4:[4,8],5:[3,8],6:[2,8],7:[1,8],
   8:[1,7],9:[1,6],10:[1,5],11:[1,4],12:[1,3],13:[1,2],
   14:[1,1],15:[2,1],16:[3,1],17:[4,1],18:[5,1],19:[6,1],20:[7,1],21:[8,1],
@@ -522,49 +1732,116 @@ const SIDE_CLASS={
 
 function buildBoard(){
   const board=document.getElementById('board');
+  const walkersLayer=document.getElementById('walkers-layer');
   SQ.forEach(s=>{
     const [gc,gr]=GRID[s.id];
     const div=document.createElement('div');
-    div.className=`sq ${SIDE_CLASS[s.id]} ${s.bg}`;
+    div.className=`sq ${SIDE_CLASS[s.id]}` + (s.id===7?' corner-jail':'');
     div.id=`sq-${s.id}`;
     div.style.cssText=`grid-column:${gc};grid-row:${gr};`;
-    // Strip
-    if(s.color){
-      const strip=document.createElement('div');
-      strip.className='sq-strip';
-      strip.style.background=s.color;
-      div.appendChild(strip);
+
+    if(s.id===7){
+      div.innerHTML=`
+        <div class="jail-side-label">JAIL</div>
+        <div class="jail-box">${getSquareArtSVG(7)}</div>
+        <div class="jail-bottom-label">
+          <div class="sq-name">${s.name}</div>
+          <div class="sq-en">${s.en}</div>
+        </div>
+      `;
+    } else {
+      if(s.color){
+        const strip=document.createElement('div');
+        strip.className='sq-strip';
+        strip.style.background=s.color;
+        div.appendChild(strip);
+      }
+      const head=document.createElement('div');
+      head.className='sq-head';
+      head.innerHTML=`<div class="sq-name">${s.name}</div><div class="sq-en">${s.en||''}</div>`;
+      div.appendChild(head);
+
+      const art=document.createElement('div');
+      art.className='sq-art';
+      art.innerHTML=getSquareArtSVG(s.id);
+      div.appendChild(art);
     }
-    // Emoji
-    const em=document.createElement('div');
-    em.className='sq-emoji';em.textContent=s.emoji||'';
-    div.appendChild(em);
-    // Name
-    const nm=document.createElement('div');
-    nm.className='sq-name';nm.textContent=s.name;
-    div.appendChild(nm);
-    // Token area
-    const tok=document.createElement('div');
-    tok.className='sq-tokens';tok.id=`tok-${s.id}`;
-    div.appendChild(tok);
-    div.onclick=()=>showSqModal(s.id);
+
+    div.onclick=()=>showSqModal(s.id, false);
     board.appendChild(div);
   });
-  // Put center back at end so it stays on top
+
   const center=document.getElementById('center');
   board.appendChild(center);
   center.style.cssText='grid-column:2/8;grid-row:2/8;';
+  board.appendChild(walkersLayer);
 }
 
-function renderTokens(){
-  // Clear all token areas
-  document.querySelectorAll('.sq-tokens').forEach(el=>el.innerHTML='');
-  players.forEach(p=>{
-    const tok=document.getElementById(`tok-${p.pos}`);
-    if(tok){
-      const span=document.createElement('span');
-      span.className='sq-token';span.textContent=TOKEN_EMOJIS[p.colorIdx];
-      span.title=p.name;tok.appendChild(span);
+// ── 3D WALKING CHARACTERS POSITIONING & ANIMATION ─────────────
+function getSquareCoords(sqId, playerIdx, totalOnSquare){
+  const sqEl=document.getElementById(`sq-${sqId}`);
+  if(!sqEl) return {x:0, y:0};
+  const cx = sqEl.offsetLeft + sqEl.offsetWidth / 2;
+  const cy = sqEl.offsetTop + sqEl.offsetHeight * 0.68;
+
+  // Slight fan-out offset when multiple characters stand on the same square
+  let ox=0, oy=0;
+  if(totalOnSquare > 1){
+    const angle = (playerIdx / totalOnSquare) * Math.PI * 2;
+    ox = Math.cos(angle) * 16;
+    oy = Math.sin(angle) * 8;
+  }
+  return {x: cx + ox, y: cy + oy};
+}
+
+function renderTokens(walkingPlayerIdx = -1){
+  document.querySelectorAll('.sq').forEach(el=>el.classList.remove('active-step'));
+  const layer=document.getElementById('walkers-layer');
+
+  // Count how many players are on each square for neat spacing
+  const posGroups={};
+  players.forEach((p, idx)=>{
+    if(!posGroups[p.pos]) posGroups[p.pos]=[];
+    posGroups[p.pos].push(idx);
+  });
+
+  players.forEach((p, idx)=>{
+    let walker=document.getElementById(`walker-${idx}`);
+    if(!walker){
+      walker=document.createElement('div');
+      walker.id=`walker-${idx}`;
+      walker.className='walker';
+      walker.setAttribute('data-dir', '1');
+      walker.innerHTML=`
+        <div class="walker-label">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${COLORS[p.colorIdx]}"></span>
+          <span>${p.name}</span>
+        </div>
+        ${buildCharacterSVG(p.av, COLORS[p.colorIdx])}
+      `;
+      layer.appendChild(walker);
+    }
+
+    const group=posGroups[p.pos]||[idx];
+    const slotIdx=group.indexOf(idx);
+    const {x, y}=getSquareCoords(p.pos, slotIdx, group.length);
+
+    // Determine facing direction based on horizontal movement
+    const prevX = parseFloat(walker.dataset.x || x);
+    if(Math.abs(x - prevX) > 4){
+      walker.setAttribute('data-dir', x < prevX ? '-1' : '1');
+    }
+    walker.dataset.x = x;
+    walker.dataset.y = y;
+
+    walker.style.left = `${x}px`;
+    walker.style.top = `${y}px`;
+    walker.classList.toggle('active-turn', idx===currentPlayer && gameStarted);
+    walker.classList.toggle('walking', idx===walkingPlayerIdx);
+
+    if(idx===currentPlayer && gameStarted){
+      const sqEl=document.getElementById(`sq-${p.pos}`);
+      if(sqEl) sqEl.classList.add('active-step');
     }
   });
 }
@@ -572,45 +1849,67 @@ function renderTokens(){
 function renderPlayerList(){
   const list=document.getElementById('pl-list');
   list.innerHTML='';
+  if(!players.length){
+    list.innerHTML='<div class="pl-empty">👆 點擊「加入實驗室」召喚會走路的小人開始遊戲！</div>';
+    return;
+  }
   players.forEach((p,i)=>{
     const div=document.createElement('div');
     div.className='pl-item'+(i===currentPlayer&&gameStarted?' active':'');
-    div.innerHTML=`<span>${TOKEN_EMOJIS[p.colorIdx]}</span><span style="color:${COLORS[p.colorIdx]}">${AVATARS[p.av]}</span><span>${p.name}</span><span class="pl-pos">格${p.pos}</span>`;
+    div.innerHTML=`
+      <span class="pl-dot" style="background:${COLORS[p.colorIdx]}"></span>
+      <span>${AVATARS[p.av]}</span>
+      <span style="color:${COLORS[p.colorIdx]}">${p.name}</span>
+      <span class="pl-pos">格${p.pos}</span>
+    `;
     list.appendChild(div);
   });
 }
 
 function updateNav(){
   const el=document.getElementById('nav-turn');
-  if(!gameStarted||!players.length){el.textContent='';return;}
+  if(!gameStarted||!players.length){
+    el.classList.remove('show');
+    el.textContent='';
+    return;
+  }
   const p=players[currentPlayer];
-  el.textContent=`${AVATARS[p.av]} ${p.name} 的回合`;
+  el.classList.add('show');
+  el.innerHTML=`<span>${AVATARS[p.av]}</span><span>輪到 ${p.name} 擲骰子</span>`;
 }
 
-// ── JOIN ──────────────────────────────────────────────────────
+// ── JOIN MODAL & CHARACTER PREVIEW ────────────────────────────
+function renderJoinPreviews(){
+  const c = COLORS[joinColor] || COLORS[0];
+  ['m','f','r'].forEach(av=>{
+    const box=document.getElementById(`preview-av-${av}`);
+    if(box) box.innerHTML=buildCharacterSVG(av, c);
+  });
+}
+
 function openJoin(){
   if(players.length>=6){toast('最多6位研究員！');return;}
   document.getElementById('player-name').value='';
   buildColorRow();
+  renderJoinPreviews();
   document.getElementById('join-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('player-name').focus(),100);
 }
 function buildColorRow(){
   const row=document.getElementById('color-row');
   row.innerHTML='';
+  if(players.some(p=>p.colorIdx===joinColor)){
+    for(let i=0;i<6;i++){if(!players.some(p=>p.colorIdx===i)){joinColor=i;break;}}
+  }
   COLORS.forEach((c,i)=>{
     const used=players.some(p=>p.colorIdx===i);
     if(used)return;
     const btn=document.createElement('button');
-    btn.className='color-btn'+(i===joinColor&&!players.some(p=>p.colorIdx===joinColor)?' on':'');
+    btn.className='color-btn'+(i===joinColor?' on':'');
     btn.style.background=c;
-    btn.onclick=()=>{joinColor=i;buildColorRow();};
+    btn.onclick=()=>{joinColor=i;buildColorRow();renderJoinPreviews();};
     row.appendChild(btn);
   });
-  // Auto-select first available
-  if(players.some(p=>p.colorIdx===joinColor)){
-    for(let i=0;i<6;i++){if(!players.some(p=>p.colorIdx===i)){joinColor=i;break;}}
-    buildColorRow();
-  }
 }
 function pickAv(v){
   joinAv=v;
@@ -620,15 +1919,14 @@ function pickAv(v){
 }
 function joinGame(){
   const name=document.getElementById('player-name').value.trim();
-  if(!name){toast('請輸入名字！');return;}
+  if(!name){toast('請輸入研究員名字！');return;}
   if(players.some(p=>p.colorIdx===joinColor)){toast('顏色已被選用！');return;}
   players.push({name,av:joinAv,colorIdx:joinColor,pos:0,inJail:false,jailTurns:0,skipTurns:0});
   closeModal('join-modal');
   gameStarted=true;
   renderTokens();renderPlayerList();updateNav();
   updateButtons();
-  toast(`${AVATARS[joinAv]} ${name} 加入實驗室！`);
-  // Hide join button if 6 players
+  toast(`${AVATARS[joinAv]} ${name} 的小人已站上起點！`);
   document.getElementById('join-btn').style.display=players.length>=6?'none':'';
 }
 
@@ -637,68 +1935,108 @@ function updateButtons(){
   rollBtn.disabled=!gameStarted||diceRolling;
 }
 
-// ── DICE & MOVE ───────────────────────────────────────────────
-const DICE_FACES=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+// ── DICE & REAL WALKING STEP-BY-STEP MOVE ─────────────────────
 function doRoll(){
   if(!gameStarted||diceRolling||!players.length)return;
   const p=players[currentPlayer];
   if(p.skipTurns>0){
     p.skipTurns--;
-    toast(`${p.name} 暫停回合中，還剩 ${p.skipTurns} 回合`);
+    toast(`⏳ ${p.name} 暫停回合中（剩餘 ${p.skipTurns} 回合）`);
     nextTurn();return;
   }
   diceRolling=true;
   document.getElementById('roll-btn').disabled=true;
   const d1=document.getElementById('dice1');
   const d2=document.getElementById('dice2');
-  d1.classList.add('rolling');d2.classList.add('rolling');
+  d1.classList.remove('rolled-glow');
+  d2.classList.remove('rolled-glow');
+  d1.classList.add('rolling');
+  d2.classList.add('rolling');
+
   const res=document.getElementById('dice-result');
-  res.classList.remove('show');res.textContent='';
+  res.classList.remove('show');
+  res.innerHTML=`<span>🎲 ${p.name} 正在擲骰子…</span>`;
+
   let count=0;
   const anim=setInterval(()=>{
-    d1.textContent=DICE_FACES[Math.ceil(Math.random()*6)];
-    d2.textContent=DICE_FACES[Math.ceil(Math.random()*6)];
+    const temp1=Math.ceil(Math.random()*6);
+    const temp2=Math.ceil(Math.random()*6);
+    setDieFace('dice1', temp1, 'die1-num', false);
+    setDieFace('dice2', temp2, 'die2-num', false);
     count++;
     if(count>14){
       clearInterval(anim);
-      d1.classList.remove('rolling');d2.classList.remove('rolling');
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      d1.classList.add('rolled-glow');
+      d2.classList.add('rolled-glow');
+
       const r1=Math.ceil(Math.random()*6);
       const r2=Math.ceil(Math.random()*6);
-      d1.textContent=DICE_FACES[r1];d2.textContent=DICE_FACES[r2];
+      setDieFace('dice1', r1, 'die1-num', true);
+      setDieFace('dice2', r2, 'die2-num', true);
       const total=r1+r2;
-      // Show result
-      res.textContent=`${r1} + ${r2} = ${total} 步！`;
+
+      lastRollInfo={r1, r2, total, playerName:p.name};
+
+      res.innerHTML=`<span>🎲 點數：<strong>${r1}</strong> + <strong>${r2}</strong> =</span> <span class="dice-total-badge">共 ${total} 點</span>`;
       res.classList.add('show');
-      setTimeout(()=>movePlayer(total),600);
+
+      const navRoll=document.getElementById('nav-last-roll');
+      navRoll.innerHTML=`🎲 ${p.name} 擲出：<strong>${r1} + ${r2} = ${total} 點</strong>`;
+      navRoll.classList.add('show');
+
+      toast(`🎲 ${p.name} 擲出 ${r1} + ${r2} = ${total} 點！小人出發！`);
+
+      setTimeout(()=>movePlayerStepByStep(total, 1), 420);
     }
   },55);
 }
 
-function movePlayer(steps){
+function movePlayerStepByStep(steps, dir = 1, onComplete = null){
   const p=players[currentPlayer];
-  const oldPos=p.pos;
-  p.pos=(p.pos+steps)%28;
-  // Passed start bonus
-  if(p.pos<oldPos&&steps>0)toast(`${p.name} 經過起點！加油繼續研究 🚀`);
-  renderTokens();renderPlayerList();
-  setTimeout(()=>onLand(currentPlayer),400);
+  let remaining=steps;
+
+  // Start walking limb animation immediately
+  renderTokens(currentPlayer);
+
+  const stepInterval=setInterval(()=>{
+    if(remaining<=0){
+      clearInterval(stepInterval);
+      // Stop walking limb animation
+      renderTokens(-1);
+      if(onComplete){
+        setTimeout(onComplete, 380);
+      } else {
+        setTimeout(()=>onLand(currentPlayer), 420);
+      }
+      return;
+    }
+    const oldPos=p.pos;
+    p.pos=(p.pos + dir + 28) % 28;
+    if(dir > 0 && p.pos===0 && oldPos===27){
+      toast(`🚀 ${p.name} 經過起點！啟動研究能量！`);
+    }
+    remaining--;
+    renderTokens(currentPlayer);
+    renderPlayerList();
+  }, 330);
 }
 
 function onLand(pi){
   const p=players[pi];
   const sq=SQ[p.pos];
   diceRolling=false;
-  // Handle special squares
   if(sq.type==='goJail'){
+    toast(`⚠️ ${p.name} 觸發污染警報，送往隔離觀察室！`);
     p.pos=7;p.inJail=true;p.skipTurns=1;
-    renderTokens();renderPlayerList();
-    toast(`⚠️ ${p.name} 被送進隔離觀察室！`);
-    setTimeout(nextTurn,1200);
+    renderTokens(-1);renderPlayerList();
+    setTimeout(nextTurn,1400);
     return;
   }
-  if(sq.type==='jail'){toast(`${p.name} 在隔離觀察室外觀察（訪客）🔒`);setTimeout(nextTurn,1000);return;}
-  if(sq.type==='free'){toast(`${p.name} 抵達休息區，放鬆一下！☕`);setTimeout(nextTurn,1000);return;}
-  if(sq.type==='start'){toast(`${p.name} 回到起點！啟動研究🚀`);setTimeout(nextTurn,1000);return;}
+  if(sq.type==='jail'){toast(`🔒 ${p.name} 路過隔離觀察室（安全訪客）`);setTimeout(nextTurn,1100);return;}
+  if(sq.type==='free'){toast(`☕ ${p.name} 抵達午茶與跨界交流區！`);setTimeout(nextTurn,1100);return;}
+  if(sq.type==='start'){toast(`🚀 ${p.name} 回到起點！啟動研究！`);setTimeout(nextTurn,1100);return;}
   if(sq.type==='chance'){
     pendingCard=CHANCE[Math.floor(Math.random()*CHANCE.length)];
     showCardModal(pendingCard,'機會');return;
@@ -707,89 +2045,107 @@ function onLand(pi){
     pendingCard=GRANT[Math.floor(Math.random()*GRANT.length)];
     showCardModal(pendingCard,'命運');return;
   }
-  // Research square - show info
-  showSqModal(p.pos,true);
+  showSqModal(p.pos, true);
 }
 
 function nextTurn(){
+  if(!players.length)return;
   currentPlayer=(currentPlayer+1)%players.length;
   diceRolling=false;
   document.getElementById('roll-btn').disabled=false;
-  renderPlayerList();updateNav();
+  renderTokens(-1);
+  renderPlayerList();
+  updateNav();
 }
 
 // ── MODALS ────────────────────────────────────────────────────
 function showSqModal(id, fromLand=false){
+  modalFromLand=fromLand;
   const sq=SQ[id];
   const content=document.getElementById('sq-modal-content');
-  let html=`<div class="sq-info-badge" style="background:${sq.color||'#2a3a80'}22;color:${sq.color||'#8899cc'}">
-    <span>${sq.emoji}</span><span>${sq.en||''}</span></div>
-  <h2 style="color:${sq.color||'#f0f4ff'}">${sq.emoji} ${sq.name}</h2>
+  const okBtn=document.getElementById('sq-modal-ok');
+
+  let html='';
+  if(fromLand && lastRollInfo && players.length){
+    const p=players[currentPlayer];
+    html+=`<div class="modal-roll-pill">
+      🎲 ${AVATARS[p.av]} ${p.name} 擲出 <strong>${lastRollInfo.r1} + ${lastRollInfo.r2} = ${lastRollInfo.total} 點</strong> → 走到【${sq.name}】
+    </div><br>`;
+  }
+
+  html+=`<div class="sq-info-badge" style="background:${sq.color||'#72efdd'};color:#0b132b">
+    <span>${sq.emoji}</span><span>${sq.en||'Lab Station'}</span></div>
+  <h2>${sq.emoji} ${sq.name}</h2>
   <p style="margin-top:6px">${sq.desc}</p>`;
+
   if(sq.learn&&sq.learn.length){
-    html+=`<div style="margin-top:12px;font-family:'Outfit';font-size:9px;font-weight:700;letter-spacing:.1em;color:#8899cc;text-transform:uppercase;margin-bottom:6px">📚 需要學習的知識</div>
+    html+=`<div style="margin-top:12px;font-family:'Outfit';font-size:11px;font-weight:900;letter-spacing:.08em;color:#1d3557;text-transform:uppercase;margin-bottom:6px">📚 需要學習的核心知識與技能</div>
     <div class="learn-list">`;
     sq.learn.forEach(l=>{
-      html+=`<div class="learn-item" style="color:${sq.color||'#8899cc'}">
+      html+=`<div class="learn-item">
         <span class="learn-icon">${l.icon}</span><span>${l.text}</span></div>`;
     });
     html+=`</div>`;
   }
-  if(fromLand&&players.length){
-    const p=players[currentPlayer];
-    html+=`<div style="margin-top:14px;text-align:center;font-size:12px;color:#8899cc">
-      ${AVATARS[p.av]} <strong style="color:${COLORS[p.colorIdx]}">${p.name}</strong> 落腳於此！</div>`;
-  }
+
+  okBtn.textContent = fromLand ? '✅ 完成研究，換下一位' : '關閉視窗';
   content.innerHTML=html;
   document.getElementById('sq-modal').classList.remove('hidden');
-  if(fromLand){
-    // Auto dismiss & next turn after 2s if no special action needed
-    // (user must close manually)
+}
+
+function closeSqModal(){
+  document.getElementById('sq-modal').classList.add('hidden');
+  if(modalFromLand){
+    modalFromLand=false;
+    nextTurn();
   }
+}
+
+function previewDeck(deckType){
+  const list = deckType==='chance' ? CHANCE : GRANT;
+  const sample = list[Math.floor(Math.random()*list.length)];
+  toast(`${deckType==='chance'?'❓ 機會卡預覽':'💡 命運卡預覽'}：【${sample.title}】${sample.text}`);
 }
 
 function showCardModal(card, type){
   const content=document.getElementById('card-modal-content');
+  let rollBadge='';
+  if(lastRollInfo && players.length){
+    const p=players[currentPlayer];
+    rollBadge=`<div class="modal-roll-pill">🎲 ${p.name} 擲出 ${lastRollInfo.r1} + ${lastRollInfo.r2} = ${lastRollInfo.total} 點</div>`;
+  }
   content.innerHTML=`
-    <div style="font-family:'Outfit';font-size:9px;font-weight:700;letter-spacing:.12em;color:${type==='機會'?'#fb923c':'#fbbf24'};text-transform:uppercase;margin-bottom:8px">
-      ${type==='機會'?'🎰 創新靈感':'🏆 研究經費'}</div>
+    ${rollBadge}
+    <div style="font-family:'Outfit';font-size:12px;font-weight:900;letter-spacing:.12em;color:${type==='機會'?'#ef476f':'#d97706'};text-transform:uppercase;margin-bottom:6px">
+      ${type==='機會'?'❓ 機會 · 創新靈感 (Discovery)':'💡 命運 · 研究經費 (Grant)'}</div>
     <div class="card-visual">${card.emoji}</div>
     <h2>${card.title}</h2>
     <p style="margin-top:6px">${card.desc}</p>
-    <div class="card-effect" style="color:${type==='機會'?'#fb923c':'#fbbf24'}">${card.text}</div>
+    <div class="card-effect" style="background:${type==='機會'?'#ffe5ec':'#fef3c7'}">${card.text}</div>
   `;
   document.getElementById('card-modal').classList.remove('hidden');
 }
 
 function applyCard(){
-  closeModal('card-modal');
+  document.getElementById('card-modal').classList.add('hidden');
   if(!pendingCard)return;
   const p=players[currentPlayer];
   const card=pendingCard;pendingCard=null;
   if(card.effect==='advance'){
-    p.pos=(p.pos+card.val)%28;
-    renderTokens();renderPlayerList();
     toast(`${p.name} 前進 ${card.val} 格！`);
+    movePlayerStepByStep(card.val, 1, ()=>nextTurn());
   }else if(card.effect==='back'){
-    p.pos=Math.max(0,p.pos-card.val);
-    renderTokens();renderPlayerList();
     toast(`${p.name} 退後 ${card.val} 格`);
+    movePlayerStepByStep(card.val, -1, ()=>nextTurn());
   }else if(card.effect==='skip'){
     p.skipTurns=(p.skipTurns||0)+card.val;
     toast(`${p.name} 暫停 ${card.val} 回合`);
+    setTimeout(nextTurn,600);
   }
-  setTimeout(nextTurn,600);
 }
 
 function closeModal(id){
   document.getElementById(id).classList.add('hidden');
-  if(id==='sq-modal'&&diceRolling===false&&gameStarted){
-    // If closed from land, proceed to next turn
-    diceRolling=false;
-    document.getElementById('roll-btn').disabled=false;
-    nextTurn();
-    // Only do this once
-  }
 }
 
 // ── TOAST ─────────────────────────────────────────────────────
@@ -798,44 +2154,38 @@ function toast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2800);
 }
 
 // ── RESPONSIVE SCALE ──────────────────────────────────────────
 function scaleBoard(){
   const wrap=document.querySelector('.wrap');
-  const available=Math.min(wrap.clientWidth-16,wrap.clientHeight-16);
-  // Board natural size: 8*82 + 0 = 656px (cols: 2×82 + 6×72 = 164+432=596... let me recalc)
-  // grid: 2×82 + 6×72 = 164 + 432 = 596px
-  const boardNatural=596;
-  const scale=Math.min(1,available/boardNatural);
+  const availW=wrap.clientWidth-20;
+  const availH=wrap.clientHeight-24;
+  const boardW=1080;
+  const boardH=is3DMode ? 730 : 760;
+  const scale=Math.min(1.06, availW/boardW, availH/boardH);
   document.getElementById('board-scale').style.transform=`scale(${scale})`;
 }
 
 // ── INIT ──────────────────────────────────────────────────────
+initDiceDOM();
 buildBoard();
 scaleBoard();
-window.addEventListener('resize',scaleBoard);
+window.addEventListener('resize', ()=>{
+  scaleBoard();
+  renderTokens(-1);
+});
 
-// Close modal on backdrop click
 document.querySelectorAll('.modal-bg').forEach(bg=>{
   bg.addEventListener('click',e=>{
     if(e.target===bg){
-      const id=bg.id;
-      if(id==='sq-modal'||id==='card-modal')return; // don't close these on backdrop
-      closeModal(id);
+      if(bg.id==='card-modal')return;
+      if(bg.id==='sq-modal'){closeSqModal();return;}
+      closeModal(bg.id);
     }
   });
 });
-
-// Handle sq-modal close properly (don't trigger nextTurn on manual open)
-document.getElementById('sq-modal').querySelector('.modal-close').onclick=function(){
-  document.getElementById('sq-modal').classList.add('hidden');
-  // Only call nextTurn if we landed here via game
-  if(gameStarted&&players.length&&!diceRolling){
-    diceRolling=false;
-    document.getElementById('roll-btn').disabled=false;
-    nextTurn();
-  }
-};
 </script>
+</body>
+</html>
