@@ -1,0 +1,841 @@
+<title>BiotechOpoly · 陳宏霖實驗室大富翁</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060818;--fg:#f0f4ff;--muted:#8899cc;--border:#1e2a5a;
+  --card:#0d1535;--card2:#111b40;
+  --pink:#f472b6;--blue:#60a5fa;--green:#4ade80;--purple:#c084fc;
+  --orange:#fb923c;--yellow:#fbbf24;--teal:#2dd4bf;--red:#f87171;
+  --cell-w:82px;--cell-h:82px;--cell-reg-w:72px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Outfit','Noto Sans TC',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden}
+
+/* ── NAV ── */
+nav{height:48px;background:#0a0f28cc;backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;
+  padding:0 max(14px,env(safe-area-inset-left,0px));gap:10px;position:relative;z-index:50}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:15px;font-weight:900;
+  background:linear-gradient(90deg,#f472b6,#60a5fa,#4ade80);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;letter-spacing:.02em}
+.nav-sub{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.06em}
+.nav-sp{flex:1}
+#nav-turn{font-size:12px;font-weight:700;color:var(--yellow);background:#1a1200;
+  padding:4px 12px;border-radius:20px;border:1px solid #3a2800}
+
+/* ── LAYOUT ── */
+.wrap{height:calc(100% - 48px);display:flex;align-items:center;justify-content:center;
+  padding:8px;overflow:hidden}
+
+/* ── BOARD ── */
+.board-scale{transform-origin:top center;transition:transform .2s}
+.board-wrap{padding:4px;border-radius:12px;
+  background:linear-gradient(135deg,#f472b6,#818cf8,#34d399,#fbbf24,#60a5fa,#fb923c,#f472b6);
+  background-size:300% 300%;animation:rainbowBorder 4s linear infinite;
+  box-shadow:0 0 40px #6060ff50,0 0 80px #f472b620}
+@keyframes rainbowBorder{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.board{
+  display:grid;
+  grid-template-columns:var(--cell-w) repeat(6,var(--cell-reg-w)) var(--cell-w);
+  grid-template-rows:var(--cell-h) repeat(6,var(--cell-reg-w)) var(--cell-h);
+  background:linear-gradient(135deg,#0d1535,#070c22);
+  border-radius:8px;
+  position:relative}
+/* Board starfield */
+.board::before{content:'';position:absolute;inset:0;border-radius:8px;
+  background-image:radial-gradient(circle,#fff 1px,transparent 1px);
+  background-size:24px 24px;opacity:.06;pointer-events:none}
+
+/* ── CENTER ── */
+.board-center{
+  grid-column:2/8;grid-row:2/8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  background:radial-gradient(ellipse at 40% 25%,#1e1272 0%,#080520 60%,#030210 100%);
+  border-radius:4px;position:relative;overflow:hidden;padding:10px;
+  border:1px solid #2a2060}
+.board-center::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 40%,#6040c025 0%,transparent 65%);
+  pointer-events:none}
+/* rotating glow ring */
+.board-center::after{content:'';position:absolute;inset:-2px;border-radius:6px;
+  background:conic-gradient(from 0deg,#f472b650,#818cf850,#34d39950,#fbbf2450,#60a5fa50,#f472b650);
+  opacity:.3;animation:spinGlow 6s linear infinite;z-index:0;pointer-events:none}
+@keyframes spinGlow{to{transform:rotate(360deg)}}
+.bc-logo{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;line-height:1.15;text-align:center;
+  background:linear-gradient(135deg,#f472b6,#a78bfa,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  position:relative;z-index:1;filter:drop-shadow(0 0 12px #818cf850)}
+.bc-sub{font-size:9px;font-weight:700;color:#a0b0e0;letter-spacing:.08em;text-align:center;
+  margin-top:-4px;position:relative;z-index:1}
+.bc-dna{font-size:32px;margin:2px 0;filter:drop-shadow(0 0 12px #818cf8);position:relative;z-index:1;
+  animation:floatDna 3s ease-in-out infinite}
+@keyframes floatDna{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.players-on-board{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;min-height:24px}
+.player-chip{display:flex;align-items:center;gap:4px;background:var(--card2);
+  border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;
+  border:1.5px solid currentColor}
+.dice-area{display:flex;align-items:center;gap:8px;margin-top:4px}
+.dice{width:44px;height:44px;background:linear-gradient(135deg,#fff,#e8eaff);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 4px 16px #0008,0 0 0 2px rgba(255,255,255,0.15);
+  cursor:default;transition:transform .1s;user-select:none}
+.dice.rolling{animation:diceRoll .4s ease infinite}
+@keyframes diceRoll{0%{transform:rotate(0) scale(1)}25%{transform:rotate(18deg) scale(1.15)}50%{transform:rotate(-12deg) scale(0.88)}75%{transform:rotate(9deg) scale(1.08)}100%{transform:rotate(0) scale(1)}}
+/* Dice result pop */
+.dice-result{font-size:15px;font-weight:900;text-align:center;padding:6px 14px;
+  border-radius:20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;letter-spacing:.05em;box-shadow:0 4px 18px #6366f170;
+  transition:all .35s cubic-bezier(.34,1.4,.64,1);opacity:0;transform:scale(0.6);
+  white-space:nowrap;position:relative;z-index:5;min-height:32px;display:flex;
+  align-items:center;justify-content:center}
+.dice-result.show{opacity:1;transform:scale(1)}
+#roll-btn{padding:7px 16px;border-radius:20px;border:none;cursor:pointer;font-size:12px;font-weight:800;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
+  box-shadow:0 4px 16px #6366f140;transition:all .2s;letter-spacing:.04em;white-space:nowrap}
+#roll-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px #6366f160}
+#roll-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+#join-btn{padding:8px 18px;border-radius:20px;border:2px solid var(--pink);cursor:pointer;
+  font-size:12px;font-weight:800;background:transparent;color:var(--pink);
+  transition:all .2s;letter-spacing:.04em}
+#join-btn:hover{background:var(--pink);color:#fff;box-shadow:0 4px 16px #f472b640}
+
+/* ── SQUARES ── */
+.sq{position:relative;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;cursor:pointer;overflow:hidden;
+  border:1px solid #1e2d6a;transition:all .2s;gap:2px}
+.sq:hover{filter:brightness(1.3) saturate(1.2);transform:scale(1.06);z-index:10;
+  box-shadow:inset 0 0 12px rgba(255,255,255,0.08)}
+.sq-strip{position:absolute;top:0;left:0;right:0;height:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+/* Left col squares: strip on right */
+.sq.left .sq-strip{top:0;bottom:0;left:auto;right:0;width:13px;height:auto}
+/* Right col squares: strip on left */
+.sq.right .sq-strip{top:0;bottom:0;left:0;right:auto;width:13px;height:auto}
+/* Top row: strip on bottom */
+.sq.top .sq-strip{top:auto;bottom:0;height:14px;width:auto}
+.sq-emoji{font-size:20px;line-height:1;margin-top:14px;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.7))}
+.sq.left .sq-emoji,.sq.right .sq-emoji{margin-top:0;font-size:17px}
+.sq.top .sq-emoji{margin-top:0;margin-bottom:14px}
+.sq-name{font-size:9px;font-weight:800;text-align:center;line-height:1.3;
+  color:#ffffff;padding:0 4px;margin-top:2px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.9),0 0 8px rgba(0,0,0,0.6);
+  letter-spacing:.01em}
+.sq.left .sq-name,.sq.right .sq-name{font-size:8.5px;writing-mode:vertical-rl;
+  text-orientation:mixed;transform:rotate(180deg);margin-top:0;
+  text-shadow:0 1px 4px rgba(0,0,0,0.9)}
+.sq.top .sq-name{margin-top:0;margin-bottom:2px}
+.sq-tokens{position:absolute;bottom:3px;left:0;right:0;display:flex;flex-wrap:wrap;
+  gap:1px;justify-content:center}
+.sq-token{font-size:12px;line-height:1;filter:drop-shadow(0 0 4px rgba(255,255,255,0.6))}
+/* Corner squares */
+.sq.corner{font-size:9px;font-weight:900;flex-direction:column;gap:3px}
+.sq.corner .sq-emoji{font-size:26px;margin-top:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
+.sq.corner .sq-name{font-size:9px;font-weight:900;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,0.8)}
+
+/* Color-coded backgrounds — vivid dark gradients */
+.sq-bg-blue{background:linear-gradient(160deg,#0a1840 0%,#060e28 100%)}
+.sq-bg-green{background:linear-gradient(160deg,#0a2214 0%,#041208 100%)}
+.sq-bg-pink{background:linear-gradient(160deg,#280a22 0%,#160510 100%)}
+.sq-bg-purple{background:linear-gradient(160deg,#140a30 0%,#0a0420 100%)}
+.sq-bg-orange{background:linear-gradient(160deg,#241004 0%,#140600 100%)}
+.sq-bg-teal{background:linear-gradient(160deg,#041e22 0%,#020e12 100%)}
+.sq-bg-yellow{background:linear-gradient(160deg,#201800 0%,#120e00 100%)}
+.sq-bg-corner{background:linear-gradient(135deg,#0e1840 0%,#07102e 100%)}
+.sq-bg-chance{background:linear-gradient(160deg,#221002 0%,#140800 100%)}
+.sq-bg-grant{background:linear-gradient(160deg,#001428 0%,#000810 100%)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:#00000088;backdrop-filter:blur(6px);
+  z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-bg.hidden{display:none}
+.modal{background:var(--card);border:1.5px solid var(--border);border-radius:20px;
+  padding:24px;width:min(420px,100%);max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 64px #000a;animation:popIn .25s cubic-bezier(.34,1.4,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(10px)}}
+.modal h2{font-size:18px;font-weight:900;margin-bottom:4px}
+.modal p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7}
+.modal-close{position:absolute;top:14px;right:16px;background:var(--border);
+  border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;color:var(--muted);
+  font-size:14px;display:flex;align-items:center;justify-content:center}
+.modal{position:relative}
+/* Avatar pick */
+.avatar-row{display:flex;gap:12px;margin-bottom:16px;justify-content:center}
+.avatar-btn{width:70px;height:70px;border-radius:14px;border:2.5px solid var(--border);
+  background:var(--card2);font-size:36px;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center}
+.avatar-btn.on{border-color:var(--pink);box-shadow:0 0 16px var(--pink)40;transform:scale(1.08)}
+/* Color pick */
+.color-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.color-btn{width:32px;height:32px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:all .15s}
+.color-btn.on{border-color:#fff;transform:scale(1.15);box-shadow:0 0 10px currentColor}
+/* Name input */
+.name-inp{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--card2);color:var(--fg);font-size:14px;font-weight:600;
+  font-family:'Noto Sans TC',sans-serif;margin-bottom:14px;outline:none}
+.name-inp:focus{border-color:#6366f1;box-shadow:0 0 0 3px #6366f120}
+.modal-btn{width:100%;padding:11px;border-radius:12px;border:none;cursor:pointer;
+  font-size:14px;font-weight:800;letter-spacing:.04em;transition:all .18s}
+.modal-btn.primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;
+  box-shadow:0 4px 16px #6366f130}
+.modal-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px #6366f150}
+/* Square info modal */
+.sq-info-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border-radius:20px;font-size:11px;font-weight:700;margin-bottom:10px}
+.learn-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.learn-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;
+  background:var(--card2);border-radius:10px;font-size:12px;line-height:1.6;
+  border-left:3px solid currentColor}
+.learn-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+/* Card modal */
+.card-visual{font-size:48px;text-align:center;margin:10px 0;
+  filter:drop-shadow(0 0 16px var(--yellow))}
+.card-effect{background:var(--card2);border-radius:12px;padding:12px 16px;
+  font-size:13px;font-weight:700;text-align:center;border:1.5px solid var(--border);margin-top:8px}
+/* Message toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--card);border:1.5px solid var(--border);border-radius:20px;
+  padding:10px 20px;font-size:13px;font-weight:700;z-index:200;
+  box-shadow:0 8px 32px #0008;transition:transform .3s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+/* Player list in center */
+.pl-list{display:flex;flex-direction:column;gap:4px;width:100%;max-width:200px}
+.pl-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;
+  background:var(--card2);font-size:10px;font-weight:700;border:1px solid var(--border)}
+.pl-item.active{box-shadow:0 0 0 1.5px var(--yellow)}
+.pl-pos{font-size:8px;color:var(--muted);margin-left:auto}
+</style>
+
+<nav>
+  <div>
+    <div class="nav-logo">BiotechOpoly</div>
+    <div class="nav-sub">陳宏霖博士實驗室大富翁</div>
+  </div>
+  <div class="nav-sp"></div>
+  <div id="nav-turn"></div>
+</nav>
+
+<div class="wrap">
+<div class="board-scale" id="board-scale">
+<div class="board-wrap">
+<div class="board" id="board">
+  <!-- Squares injected by JS -->
+  <div class="board-center" id="center">
+    <div class="bc-dna">🧬</div>
+    <div class="bc-logo">Biotech<br>Opoly</div>
+    <div class="bc-sub">陳宏霖實驗室大富翁</div>
+    <div class="bc-sub" style="margin-top:4px;color:#f472b6">生物科技大富翁</div>
+    <div id="pl-list" class="pl-list"></div>
+    <div class="dice-area">
+      <div class="dice" id="dice1">🎲</div>
+      <div class="dice" id="dice2">🎲</div>
+    </div>
+    <div class="dice-result" id="dice-result"></div>
+    <button id="roll-btn" onclick="doRoll()" disabled>🎲 擲骰子</button>
+    <button id="join-btn" onclick="openJoin()">🔬 加入實驗室</button>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- JOIN MODAL -->
+<div class="modal-bg hidden" id="join-modal">
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('join-modal')">✕</button>
+  <h2>🔬 加入實驗室</h2>
+  <p>選擇你的研究員頭像、顏色，並輸入你的名字！</p>
+  <div class="avatar-row">
+    <div class="avatar-btn on" id="av-m" onclick="pickAv('m')">👨‍🔬</div>
+    <div class="avatar-btn" id="av-f" onclick="pickAv('f')">👩‍🔬</div>
+    <div class="avatar-btn" id="av-r" onclick="pickAv('r')">🤖</div>
+  </div>
+  <div class="color-row" id="color-row"></div>
+  <input class="name-inp" id="player-name" placeholder="輸入你的名字…" maxlength="10">
+  <button class="modal-btn primary" onclick="joinGame()">✅ 加入棋盤</button>
+</div>
+</div>
+
+<!-- SQUARE INFO MODAL -->
+<div class="modal-bg hidden" id="sq-modal">
+<div class="modal">
+  <button class="modal-close" onclick="closeModal('sq-modal')">✕</button>
+  <div id="sq-modal-content"></div>
+</div>
+</div>
+
+<!-- CARD MODAL -->
+<div class="modal-bg hidden" id="card-modal">
+<div class="modal" style="text-align:center">
+  <button class="modal-close" onclick="closeModal('card-modal')">✕</button>
+  <div id="card-modal-content"></div>
+  <button class="modal-btn primary" style="margin-top:16px" onclick="applyCard()">確認</button>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const AVATARS={m:'👨‍🔬',f:'👩‍🔬',r:'🤖'};
+const COLORS=['#f472b6','#60a5fa','#4ade80','#fbbf24','#c084fc','#fb923c'];
+const TOKEN_EMOJIS=['🔴','🔵','🟢','🟡','🟣','🟠'];
+
+// 28 squares (0=START corner, counter-clockwise)
+const SQ=[
+// 0: START (bottom-right)
+{id:0,type:'start',name:'啟動研究！',en:'BOOT UP',emoji:'🚀',bg:'sq-bg-corner',
+ desc:'歡迎加入陳宏霖博士實驗室！生物科技改變世界，從這裡出發！每次經過起點，代表你越來越熟悉實驗室了。',
+ learn:[]},
+
+// Bottom row (right→left): 1-6
+{id:1,type:'research',name:'基因體學',en:'Genomics',emoji:'🧬',color:'#60a5fa',bg:'sq-bg-blue',
+ desc:'研究人類與微生物的完整基因組，利用次世代定序（NGS）探索疾病相關遺傳變異與基因調控網路。',
+ learn:[
+   {icon:'💻',text:'Python/R程式設計：序列分析、基因組組裝與注釋'},
+   {icon:'📊',text:'統計學：差異表達分析（DEG）、全基因組關聯研究（GWAS）'},
+   {icon:'🔬',text:'分子生物學：DNA提取、文庫製備、NGS定序流程'},
+   {icon:'🗂️',text:'生物資料庫：NCBI、Ensembl、UCSC Genome Browser操作'},
+ ]},
+{id:2,type:'research',name:'微生物基因體',en:'Metagenomics',emoji:'🦠',color:'#60a5fa',bg:'sq-bg-blue',
+ desc:'分析腸道菌群、環境微生物組的多樣性與功能，探索微生物組與慢性病、免疫調節的關聯。',
+ learn:[
+   {icon:'🧫',text:'微生物學基礎：細菌分類、16S rRNA基因定序原理'},
+   {icon:'💻',text:'宏基因體工具：QIIME2、MetaPhlAn4、HUMAnN3使用'},
+   {icon:'📊',text:'多樣性分析：Alpha/Beta多樣性指數、PCoA排序'},
+   {icon:'🔗',text:'功能注釋：COG、KEGG通路分析、共現網絡建構'},
+ ]},
+{id:3,type:'chance',name:'機會！',en:'Discovery',emoji:'🎰',color:'#fb923c',bg:'sq-bg-chance',
+ desc:'抽一張「創新靈感」卡，看看你的研究有什麼意外收穫！',learn:[]},
+{id:4,type:'research',name:'代謝體學',en:'Metabolomics',emoji:'⚗️',color:'#4ade80',bg:'sq-bg-green',
+ desc:'利用質譜與核磁共振技術全面鑑定細胞與體液中的代謝物，揭示疾病代謝標記與藥物作用機制。',
+ learn:[
+   {icon:'⚗️',text:'質譜技術：LC-MS/MS、GC-MS、NMR分析原理與操作'},
+   {icon:'💻',text:'代謝體分析：XCMS、MetaboAnalyst 6.0軟體操作'},
+   {icon:'🧪',text:'樣品前處理：蛋白質沉澱、固相萃取、衍生化方法'},
+   {icon:'📊',text:'多變量統計：PCA、OPLS-DA、代謝通路富集分析'},
+ ]},
+{id:5,type:'research',name:'醣科學',en:'Glycoscience',emoji:'🍬',color:'#4ade80',bg:'sq-bg-green',
+ desc:'研究多醣與醣蛋白的結構與生物功能，探索醣鏈在細胞辨識、信號傳導與免疫調節中的核心角色。',
+ learn:[
+   {icon:'🔬',text:'醣化學：單醣結構、醣苷鍵類型、聚醣生物合成途徑'},
+   {icon:'⚗️',text:'分析技術：凝集素親和層析、HPLC醣鏈分析、質譜醣組學'},
+   {icon:'🧬',text:'酵素學：醣基轉移酶、醣苷酶的活性測定與抑制劑設計'},
+   {icon:'💻',text:'醣體資料庫：GlyTouCan、GlycoMod、CFG Glycan Array'},
+ ]},
+{id:6,type:'research',name:'AI製藥',en:'AI Drug Discovery',emoji:'🤖',color:'#c084fc',bg:'sq-bg-purple',
+ desc:'利用深度學習與圖神經網路預測藥物-靶標交互作用，大幅加速候選藥物篩選與最佳化流程。',
+ learn:[
+   {icon:'🤖',text:'深度學習：PyTorch/TensorFlow框架、圖神經網路（GNN）'},
+   {icon:'💊',text:'藥物化學：SMILES表示、分子指紋、ADMET性質預測'},
+   {icon:'💻',text:'工具鏈：AutoDock Vina、DeepChem、RDKit、Schrödinger'},
+   {icon:'📊',text:'模型評估：AUC-ROC、富集因子（EF）、交叉驗證策略'},
+ ]},
+
+// 7: JAIL corner (bottom-left)
+{id:7,type:'jail',name:'隔離觀察室',en:'Bio-Containment',emoji:'🔒',bg:'sq-bg-corner',
+ desc:'在生物安全二級隔離區觀察等待。暫停一回合，讓污染源清除後再繼續研究。',learn:[]},
+
+// Left column (bottom→top): 8-13
+{id:8,type:'research',name:'高速藥物篩選',en:'High-Throughput Screening',emoji:'🔭',color:'#f472b6',bg:'sq-bg-pink',
+ desc:'利用自動化機器人平台在數天內篩選數萬至數百萬個化合物，快速鎖定具活性的先導化合物（Hit）。',
+ learn:[
+   {icon:'🤖',text:'自動化系統：液體處理機器人（Hamilton、Tecan）操作'},
+   {icon:'🧪',text:'篩選技術：384/1536孔板、均相時間分辨螢光（HTRF）'},
+   {icon:'📊',text:'數據分析：Z因子計算、劑量反應曲線擬合（Hill方程）'},
+   {icon:'💊',text:'化合物庫管理：DMSO儲存、濃度校正、命中確認策略'},
+ ]},
+{id:9,type:'grant',name:'命運！',en:'Grant',emoji:'🏆',color:'#fbbf24',bg:'sq-bg-grant',
+ desc:'抽一張「研究經費」卡，看看你的計畫獲得什麼資助！',learn:[]},
+{id:10,type:'research',name:'3D結構設計',en:'3D Molecular Design',emoji:'🔮',color:'#c084fc',bg:'sq-bg-purple',
+ desc:'運用AlphaFold與分子動力學模擬預測蛋白質三維結構，結合分子對接設計新型藥物靶點。',
+ learn:[
+   {icon:'🔮',text:'蛋白質結構：二級、三級、四級結構與結構資料庫（PDB）'},
+   {icon:'💻',text:'結構預測：AlphaFold2、RoseTTAFold2、ESMFold操作'},
+   {icon:'⚗️',text:'分子動力學：GROMACS、AMBER力場設定與軌跡分析'},
+   {icon:'🎨',text:'視覺化工具：PyMOL、UCSF ChimeraX、VMD'},
+ ]},
+{id:11,type:'research',name:'跨領域研究',en:'Interdisciplinary',emoji:'🌐',color:'#c084fc',bg:'sq-bg-purple',
+ desc:'打破學科藩籬，整合生物、化學、工程、資訊、臨床醫學，以系統觀點解決複雜生醫問題。',
+ learn:[
+   {icon:'📊',text:'多組學整合：MOFA+、DIABLO、Seurat多模態分析'},
+   {icon:'🔗',text:'網絡分析：STRING蛋白質交互作用網絡、通路富集'},
+   {icon:'💻',text:'單細胞分析：scRNA-seq細胞類型鑑定、軌跡推斷'},
+   {icon:'🧠',text:'系統生物學：從分子到細胞到個體的多尺度建模'},
+ ]},
+{id:12,type:'research',name:'罕見疾病',en:'Rare Diseases',emoji:'🌟',color:'#f472b6',bg:'sq-bg-pink',
+ desc:'針對患者人數稀少、缺乏有效治療的罕見疾病，從基因診斷到孤兒藥研發，每一份努力都深具意義。',
+ learn:[
+   {icon:'🧬',text:'基因診斷：全外顯子組定序（WES）、全基因組定序（WGS）'},
+   {icon:'🏥',text:'臨床研究：孤兒藥指定申請、適應性臨床試驗設計'},
+   {icon:'🐭',text:'疾病模型：基因改造小鼠、患者誘導多能幹細胞（iPSC）'},
+   {icon:'🤝',text:'病患組織合作：自然病史研究、患者登記系統建立'},
+ ]},
+{id:13,type:'research',name:'多體學',en:'Multi-Omics',emoji:'🌌',color:'#fbbf24',bg:'sq-bg-yellow',
+ desc:'同時整合基因組、轉錄組、蛋白質組、代謝組和醣組學數據，系統性解析疾病的分子機制。',
+ learn:[
+   {icon:'📊',text:'組學整合框架：MOFA+、mixOmics、iCluster+方法比較'},
+   {icon:'💻',text:'降維視覺化：UMAP、t-SNE在多組學數據的應用'},
+   {icon:'🔗',text:'因果推斷：孟德爾隨機化（MR）、貝氏網絡建構'},
+   {icon:'📈',text:'縱向研究：時間序列多組學設計、動態網絡分析'},
+ ]},
+
+// 14: FREE PARKING (top-left)
+{id:14,type:'free',name:'休息區',en:'Free Parking',emoji:'☕',bg:'sq-bg-corner',
+ desc:'喘息一下！享受免費咖啡與同儕交流，充電後精神飽滿繼續研究。',learn:[]},
+
+// Top row (left→right): 15-20
+{id:15,type:'research',name:'生物科技',en:'Biotechnology',emoji:'🌱',color:'#fb923c',bg:'sq-bg-orange',
+ desc:'生物科技是結合生命科學與工程技術的整合學門，從基礎研究到產業應用，驅動醫療、農業與環境的革命性變革。',
+ learn:[
+   {icon:'🔬',text:'基礎生物學：細胞、分子生物學、遺傳學、生物化學'},
+   {icon:'🏭',text:'生物製程：發酵工程、純化技術、品質管控（GMP）'},
+   {icon:'📋',text:'法規與倫理：研究倫理、生物安全、智慧財產權'},
+   {icon:'💡',text:'創新創業：技術移轉、生技新藥開發流程、SBIR申請'},
+ ]},
+{id:16,type:'research',name:'分子生物學',en:'Molecular Biology',emoji:'🔬',color:'#60a5fa',bg:'sq-bg-blue',
+ desc:'掌握DNA複製、RNA轉錄、蛋白質翻譯的中心法則，並應用於基因表達調控與基因工程研究。',
+ learn:[
+   {icon:'🔬',text:'核心技術：PCR、qPCR、Western Blot、免疫沉澱（IP）'},
+   {icon:'🧬',text:'基因操作：CRISPR-Cas9基因編輯、質體構築、基因敲除'},
+   {icon:'🧫',text:'細胞實驗：質體轉染、慢病毒感染、藥物處理時程設計'},
+   {icon:'📊',text:'結果分析：ImageJ影像定量、統計檢定、重複性評估'},
+ ]},
+{id:17,type:'chance',name:'機會！',en:'Discovery',emoji:'🎰',color:'#fb923c',bg:'sq-bg-chance',
+ desc:'抽一張「創新靈感」卡！',learn:[]},
+{id:18,type:'research',name:'基礎細胞生物',en:'Cell Biology',emoji:'🦠',color:'#60a5fa',bg:'sq-bg-blue',
+ desc:'研究細胞的結構組成、信號傳導途徑與細胞週期調控，是所有生醫研究的核心基礎。',
+ learn:[
+   {icon:'🧫',text:'細胞培養：無菌技術、傳代、凍存/解凍、污染排除'},
+   {icon:'🔬',text:'顯微技術：相差、螢光、共焦顯微鏡操作與影像分析'},
+   {icon:'📊',text:'細胞功能：MTT存活率、流式細胞凋亡/細胞週期分析'},
+   {icon:'🧬',text:'信號傳導：受體活化、激酶磷酸化、轉錄因子調控'},
+ ]},
+{id:19,type:'research',name:'免疫學',en:'Immunology',emoji:'🛡️',color:'#fbbf24',bg:'sq-bg-yellow',
+ desc:'研究先天與適應性免疫細胞的活化機制、細胞激素調控網絡，探索自體免疫、腫瘤免疫等疾病的治療策略。',
+ learn:[
+   {icon:'🔬',text:'免疫學基礎：T細胞/B細胞亞群、NK細胞、巨噬細胞功能'},
+   {icon:'⚗️',text:'實驗技術：多色流式細胞術、ELISA、Luminex多重細胞激素檢測'},
+   {icon:'🧫',text:'細胞功能：PBMC分離、混合淋巴球反應、T細胞殺傷試驗'},
+   {icon:'💻',text:'免疫數據分析：CyTOF質譜流式、scRNA-seq免疫細胞鑑定'},
+ ]},
+{id:20,type:'research',name:'醣基分析',en:'Glycan Analysis',emoji:'🔍',color:'#4ade80',bg:'sq-bg-green',
+ desc:'運用質譜、HPLC、凝集素陣列等技術深入解析醣蛋白的醣基化圖譜，揭示醣鏈異常與疾病的關聯。',
+ learn:[
+   {icon:'⚗️',text:'醣鏈釋放：PNGase F酵素解離N-醣、β消除釋放O-醣'},
+   {icon:'💻',text:'質譜醣組學：MALDI-TOF、nanoLC-MS/MS醣鏈定序'},
+   {icon:'🔬',text:'凝集素技術：凝集素陣列、凝集素印跡（Lectin Blot）'},
+   {icon:'🗂️',text:'資料庫與工具：GlycoWorkbench、Byonic、UniCarbKB'},
+ ]},
+
+// 21: GO TO JAIL (top-right)
+{id:21,type:'goJail',name:'污染警報！',en:'Go to Isolation',emoji:'⚠️',bg:'sq-bg-corner',
+ desc:'實驗室發生汙染事件！立刻前往隔離觀察室（格7），暫停一輪讓環境徹底淨化。',learn:[]},
+
+// Right column (top→bottom): 22-27
+{id:22,type:'research',name:'蛋白質體學',en:'Proteomics',emoji:'🧩',color:'#2dd4bf',bg:'sq-bg-teal',
+ desc:'利用質譜技術鑑定和定量細胞中數千種蛋白質，探索蛋白質表達、修飾與交互作用網絡。',
+ learn:[
+   {icon:'⚗️',text:'質譜技術：底部上質譜法（BUP）、iTRAQ/TMT定量蛋白質體學'},
+   {icon:'💻',text:'資料分析：MaxQuant、Proteome Discoverer、Perseus軟體'},
+   {icon:'🔬',text:'蛋白質電泳：SDS-PAGE、2D-DIGE差異凝膠電泳'},
+   {icon:'🧬',text:'翻譯後修飾：磷酸化、泛素化、醣基化、乙醯化分析'},
+ ]},
+{id:23,type:'grant',name:'命運！',en:'Grant',emoji:'🏆',color:'#fbbf24',bg:'sq-bg-grant',
+ desc:'抽一張「研究經費」卡！',learn:[]},
+{id:24,type:'research',name:'生物資訊學',en:'Bioinformatics',emoji:'💻',color:'#2dd4bf',bg:'sq-bg-teal',
+ desc:'建立高效演算法與整合資料庫，分析大規模基因組、蛋白質組數據，從海量數據中挖掘疾病新機制。',
+ learn:[
+   {icon:'💻',text:'程式語言：Python（Biopython、Pandas）、R（Bioconductor）'},
+   {icon:'🔧',text:'工作環境：Linux Shell腳本、Snakemake/Nextflow工作流'},
+   {icon:'🗂️',text:'資料庫開發：PostgreSQL、Neo4j圖形資料庫、REST API設計'},
+   {icon:'📊',text:'機器學習：scikit-learn監督/非監督學習、深度學習模型'},
+ ]},
+{id:25,type:'research',name:'臨床轉譯',en:'Clinical Translation',emoji:'🏥',color:'#fb923c',bg:'sq-bg-orange',
+ desc:'將實驗室的基礎發現轉化為臨床可用的診斷生物標記、治療策略或醫療器材，跨越死亡之谷。',
+ learn:[
+   {icon:'🏥',text:'臨床試驗設計：IRB申請流程、病患招募策略、GCP規範'},
+   {icon:'📊',text:'臨床統計：樣本數計算、Cox比例風險迴歸、Kaplan-Meier'},
+   {icon:'📋',text:'法規事務：TFDA/FDA 510(k)、PMA申請、IND新藥申請'},
+   {icon:'🔬',text:'生物標記驗證：分析方法驗證（AMV）、臨床驗證規範'},
+ ]},
+{id:26,type:'research',name:'醣蛋白研究',en:'Glycoprotein',emoji:'🍡',color:'#4ade80',bg:'sq-bg-green',
+ desc:'分析醣蛋白的糖基化位點、醣鏈結構及其在疾病（肝癌、肝硬化）診斷與治療監測中的生物標記應用。',
+ learn:[
+   {icon:'⚗️',text:'醣蛋白分析：AFP-L3岩藻糖基化分析、GPC-3醣型鑑定'},
+   {icon:'💻',text:'醣蛋白質組學：site-specific glycoproteomics by MS'},
+   {icon:'🔬',text:'醣基化酵素：FUT8、ST6GAL1等轉移酶功能與調控'},
+   {icon:'🗂️',text:'資料庫整合：UniCarbKB、GlyConnect、O-GlcNAc資料庫'},
+ ]},
+{id:27,type:'research',name:'生醫感測器',en:'Biosensor',emoji:'📡',color:'#2dd4bf',bg:'sq-bg-teal',
+ desc:'整合奈米材料與生物辨識分子，開發高靈敏度電化學/光學生物感測器，實現疾病生物標記的即時檢測。',
+ learn:[
+   {icon:'⚡',text:'電化學方法：循環伏安法（CV）、差分脈衝伏安法（DPV）'},
+   {icon:'🔌',text:'奈米材料：金奈米粒子、碳量子點、MXene電極修飾'},
+   {icon:'🧪',text:'生物辨識層：抗體、適配子（Aptamer）、分子印跡聚合物'},
+   {icon:'📊',text:'性能評估：靈敏度、選擇性、線性範圍、偵測極限（LOD）'},
+ ]},
+];
+
+// Discovery cards (機會)
+const CHANCE=[
+  {title:'Nature論文發表！🎉',emoji:'📄',desc:'你的研究登上頂尖期刊！',effect:'advance',val:3,text:'前進 3 格'},
+  {title:'NGS定序成功！🧬',emoji:'✅',desc:'樣本品質完美，數據量充足！',effect:'advance',val:2,text:'前進 2 格'},
+  {title:'試劑用完了⋯',emoji:'😅',desc:'急需訂購新試劑，等待一回合。',effect:'skip',val:1,text:'暫停 1 回合'},
+  {title:'合作邀請！🤝',emoji:'🌍',desc:'國際實驗室邀請你加入計畫！',effect:'advance',val:4,text:'前進 4 格'},
+  {title:'細胞污染！☣️',emoji:'😱',desc:'培養箱發生黴菌污染，需要處理。',effect:'back',val:2,text:'退後 2 格'},
+  {title:'儀器故障！🔧',emoji:'⚙️',desc:'質譜儀需要維修校正。',effect:'back',val:1,text:'退後 1 格，暫停 1 回合'},
+];
+
+// Grant cards (命運)
+const GRANT=[
+  {title:'獲得科技部計畫！💰',emoji:'🏆',desc:'三年期研究計畫通過審查！',effect:'advance',val:5,text:'前進 5 格'},
+  {title:'論文被退稿⋯📧',emoji:'😔',desc:'審稿人要求大修，退回重做。',effect:'back',val:3,text:'退後 3 格'},
+  {title:'獲邀國際演講！✈️',emoji:'🎤',desc:'受邀至國際研討會發表成果！',effect:'advance',val:3,text:'前進 3 格'},
+  {title:'設備經費批准！🔬',emoji:'💡',desc:'新儀器採購獲准！',effect:'advance',val:2,text:'前進 2 格'},
+  {title:'學生提前畢業！🎓',emoji:'🎉',desc:'指導的學生順利完成論文答辯！',effect:'advance',val:1,text:'前進 1 格，下回合再骰一次'},
+  {title:'數據分析出錯！💻',emoji:'😰',desc:'程式碼有Bug，需要重新分析。',effect:'back',val:2,text:'退後 2 格'},
+];
+
+// ── GAME STATE ────────────────────────────────────────────────
+let players=[], currentPlayer=0, gameStarted=false, diceRolling=false;
+let pendingCard=null;
+let joinAv='m', joinColor=0;
+
+// ── BOARD RENDER ──────────────────────────────────────────────
+const GRID={
+  // [id]: [grid-column, grid-row]
+  0:[8,8],1:[7,8],2:[6,8],3:[5,8],4:[4,8],5:[3,8],6:[2,8],7:[1,8],
+  8:[1,7],9:[1,6],10:[1,5],11:[1,4],12:[1,3],13:[1,2],
+  14:[1,1],15:[2,1],16:[3,1],17:[4,1],18:[5,1],19:[6,1],20:[7,1],21:[8,1],
+  22:[8,2],23:[8,3],24:[8,4],25:[8,5],26:[8,6],27:[8,7]
+};
+const SIDE_CLASS={
+  0:'corner',1:'bot',2:'bot',3:'bot',4:'bot',5:'bot',6:'bot',7:'corner',
+  8:'left',9:'left',10:'left',11:'left',12:'left',13:'left',
+  14:'corner',15:'top',16:'top',17:'top',18:'top',19:'top',20:'top',21:'corner',
+  22:'right',23:'right',24:'right',25:'right',26:'right',27:'right'
+};
+
+function buildBoard(){
+  const board=document.getElementById('board');
+  SQ.forEach(s=>{
+    const [gc,gr]=GRID[s.id];
+    const div=document.createElement('div');
+    div.className=`sq ${SIDE_CLASS[s.id]} ${s.bg}`;
+    div.id=`sq-${s.id}`;
+    div.style.cssText=`grid-column:${gc};grid-row:${gr};`;
+    // Strip
+    if(s.color){
+      const strip=document.createElement('div');
+      strip.className='sq-strip';
+      strip.style.background=s.color;
+      div.appendChild(strip);
+    }
+    // Emoji
+    const em=document.createElement('div');
+    em.className='sq-emoji';em.textContent=s.emoji||'';
+    div.appendChild(em);
+    // Name
+    const nm=document.createElement('div');
+    nm.className='sq-name';nm.textContent=s.name;
+    div.appendChild(nm);
+    // Token area
+    const tok=document.createElement('div');
+    tok.className='sq-tokens';tok.id=`tok-${s.id}`;
+    div.appendChild(tok);
+    div.onclick=()=>showSqModal(s.id);
+    board.appendChild(div);
+  });
+  // Put center back at end so it stays on top
+  const center=document.getElementById('center');
+  board.appendChild(center);
+  center.style.cssText='grid-column:2/8;grid-row:2/8;';
+}
+
+function renderTokens(){
+  // Clear all token areas
+  document.querySelectorAll('.sq-tokens').forEach(el=>el.innerHTML='');
+  players.forEach(p=>{
+    const tok=document.getElementById(`tok-${p.pos}`);
+    if(tok){
+      const span=document.createElement('span');
+      span.className='sq-token';span.textContent=TOKEN_EMOJIS[p.colorIdx];
+      span.title=p.name;tok.appendChild(span);
+    }
+  });
+}
+
+function renderPlayerList(){
+  const list=document.getElementById('pl-list');
+  list.innerHTML='';
+  players.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='pl-item'+(i===currentPlayer&&gameStarted?' active':'');
+    div.innerHTML=`<span>${TOKEN_EMOJIS[p.colorIdx]}</span><span style="color:${COLORS[p.colorIdx]}">${AVATARS[p.av]}</span><span>${p.name}</span><span class="pl-pos">格${p.pos}</span>`;
+    list.appendChild(div);
+  });
+}
+
+function updateNav(){
+  const el=document.getElementById('nav-turn');
+  if(!gameStarted||!players.length){el.textContent='';return;}
+  const p=players[currentPlayer];
+  el.textContent=`${AVATARS[p.av]} ${p.name} 的回合`;
+}
+
+// ── JOIN ──────────────────────────────────────────────────────
+function openJoin(){
+  if(players.length>=6){toast('最多6位研究員！');return;}
+  document.getElementById('player-name').value='';
+  buildColorRow();
+  document.getElementById('join-modal').classList.remove('hidden');
+}
+function buildColorRow(){
+  const row=document.getElementById('color-row');
+  row.innerHTML='';
+  COLORS.forEach((c,i)=>{
+    const used=players.some(p=>p.colorIdx===i);
+    if(used)return;
+    const btn=document.createElement('button');
+    btn.className='color-btn'+(i===joinColor&&!players.some(p=>p.colorIdx===joinColor)?' on':'');
+    btn.style.background=c;
+    btn.onclick=()=>{joinColor=i;buildColorRow();};
+    row.appendChild(btn);
+  });
+  // Auto-select first available
+  if(players.some(p=>p.colorIdx===joinColor)){
+    for(let i=0;i<6;i++){if(!players.some(p=>p.colorIdx===i)){joinColor=i;break;}}
+    buildColorRow();
+  }
+}
+function pickAv(v){
+  joinAv=v;
+  ['m','f','r'].forEach(a=>{
+    document.getElementById(`av-${a}`).classList.toggle('on',a===v);
+  });
+}
+function joinGame(){
+  const name=document.getElementById('player-name').value.trim();
+  if(!name){toast('請輸入名字！');return;}
+  if(players.some(p=>p.colorIdx===joinColor)){toast('顏色已被選用！');return;}
+  players.push({name,av:joinAv,colorIdx:joinColor,pos:0,inJail:false,jailTurns:0,skipTurns:0});
+  closeModal('join-modal');
+  gameStarted=true;
+  renderTokens();renderPlayerList();updateNav();
+  updateButtons();
+  toast(`${AVATARS[joinAv]} ${name} 加入實驗室！`);
+  // Hide join button if 6 players
+  document.getElementById('join-btn').style.display=players.length>=6?'none':'';
+}
+
+function updateButtons(){
+  const rollBtn=document.getElementById('roll-btn');
+  rollBtn.disabled=!gameStarted||diceRolling;
+}
+
+// ── DICE & MOVE ───────────────────────────────────────────────
+const DICE_FACES=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function doRoll(){
+  if(!gameStarted||diceRolling||!players.length)return;
+  const p=players[currentPlayer];
+  if(p.skipTurns>0){
+    p.skipTurns--;
+    toast(`${p.name} 暫停回合中，還剩 ${p.skipTurns} 回合`);
+    nextTurn();return;
+  }
+  diceRolling=true;
+  document.getElementById('roll-btn').disabled=true;
+  const d1=document.getElementById('dice1');
+  const d2=document.getElementById('dice2');
+  d1.classList.add('rolling');d2.classList.add('rolling');
+  const res=document.getElementById('dice-result');
+  res.classList.remove('show');res.textContent='';
+  let count=0;
+  const anim=setInterval(()=>{
+    d1.textContent=DICE_FACES[Math.ceil(Math.random()*6)];
+    d2.textContent=DICE_FACES[Math.ceil(Math.random()*6)];
+    count++;
+    if(count>14){
+      clearInterval(anim);
+      d1.classList.remove('rolling');d2.classList.remove('rolling');
+      const r1=Math.ceil(Math.random()*6);
+      const r2=Math.ceil(Math.random()*6);
+      d1.textContent=DICE_FACES[r1];d2.textContent=DICE_FACES[r2];
+      const total=r1+r2;
+      // Show result
+      res.textContent=`${r1} + ${r2} = ${total} 步！`;
+      res.classList.add('show');
+      setTimeout(()=>movePlayer(total),600);
+    }
+  },55);
+}
+
+function movePlayer(steps){
+  const p=players[currentPlayer];
+  const oldPos=p.pos;
+  p.pos=(p.pos+steps)%28;
+  // Passed start bonus
+  if(p.pos<oldPos&&steps>0)toast(`${p.name} 經過起點！加油繼續研究 🚀`);
+  renderTokens();renderPlayerList();
+  setTimeout(()=>onLand(currentPlayer),400);
+}
+
+function onLand(pi){
+  const p=players[pi];
+  const sq=SQ[p.pos];
+  diceRolling=false;
+  // Handle special squares
+  if(sq.type==='goJail'){
+    p.pos=7;p.inJail=true;p.skipTurns=1;
+    renderTokens();renderPlayerList();
+    toast(`⚠️ ${p.name} 被送進隔離觀察室！`);
+    setTimeout(nextTurn,1200);
+    return;
+  }
+  if(sq.type==='jail'){toast(`${p.name} 在隔離觀察室外觀察（訪客）🔒`);setTimeout(nextTurn,1000);return;}
+  if(sq.type==='free'){toast(`${p.name} 抵達休息區，放鬆一下！☕`);setTimeout(nextTurn,1000);return;}
+  if(sq.type==='start'){toast(`${p.name} 回到起點！啟動研究🚀`);setTimeout(nextTurn,1000);return;}
+  if(sq.type==='chance'){
+    pendingCard=CHANCE[Math.floor(Math.random()*CHANCE.length)];
+    showCardModal(pendingCard,'機會');return;
+  }
+  if(sq.type==='grant'){
+    pendingCard=GRANT[Math.floor(Math.random()*GRANT.length)];
+    showCardModal(pendingCard,'命運');return;
+  }
+  // Research square - show info
+  showSqModal(p.pos,true);
+}
+
+function nextTurn(){
+  currentPlayer=(currentPlayer+1)%players.length;
+  diceRolling=false;
+  document.getElementById('roll-btn').disabled=false;
+  renderPlayerList();updateNav();
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function showSqModal(id, fromLand=false){
+  const sq=SQ[id];
+  const content=document.getElementById('sq-modal-content');
+  let html=`<div class="sq-info-badge" style="background:${sq.color||'#2a3a80'}22;color:${sq.color||'#8899cc'}">
+    <span>${sq.emoji}</span><span>${sq.en||''}</span></div>
+  <h2 style="color:${sq.color||'#f0f4ff'}">${sq.emoji} ${sq.name}</h2>
+  <p style="margin-top:6px">${sq.desc}</p>`;
+  if(sq.learn&&sq.learn.length){
+    html+=`<div style="margin-top:12px;font-family:'Outfit';font-size:9px;font-weight:700;letter-spacing:.1em;color:#8899cc;text-transform:uppercase;margin-bottom:6px">📚 需要學習的知識</div>
+    <div class="learn-list">`;
+    sq.learn.forEach(l=>{
+      html+=`<div class="learn-item" style="color:${sq.color||'#8899cc'}">
+        <span class="learn-icon">${l.icon}</span><span>${l.text}</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(fromLand&&players.length){
+    const p=players[currentPlayer];
+    html+=`<div style="margin-top:14px;text-align:center;font-size:12px;color:#8899cc">
+      ${AVATARS[p.av]} <strong style="color:${COLORS[p.colorIdx]}">${p.name}</strong> 落腳於此！</div>`;
+  }
+  content.innerHTML=html;
+  document.getElementById('sq-modal').classList.remove('hidden');
+  if(fromLand){
+    // Auto dismiss & next turn after 2s if no special action needed
+    // (user must close manually)
+  }
+}
+
+function showCardModal(card, type){
+  const content=document.getElementById('card-modal-content');
+  content.innerHTML=`
+    <div style="font-family:'Outfit';font-size:9px;font-weight:700;letter-spacing:.12em;color:${type==='機會'?'#fb923c':'#fbbf24'};text-transform:uppercase;margin-bottom:8px">
+      ${type==='機會'?'🎰 創新靈感':'🏆 研究經費'}</div>
+    <div class="card-visual">${card.emoji}</div>
+    <h2>${card.title}</h2>
+    <p style="margin-top:6px">${card.desc}</p>
+    <div class="card-effect" style="color:${type==='機會'?'#fb923c':'#fbbf24'}">${card.text}</div>
+  `;
+  document.getElementById('card-modal').classList.remove('hidden');
+}
+
+function applyCard(){
+  closeModal('card-modal');
+  if(!pendingCard)return;
+  const p=players[currentPlayer];
+  const card=pendingCard;pendingCard=null;
+  if(card.effect==='advance'){
+    p.pos=(p.pos+card.val)%28;
+    renderTokens();renderPlayerList();
+    toast(`${p.name} 前進 ${card.val} 格！`);
+  }else if(card.effect==='back'){
+    p.pos=Math.max(0,p.pos-card.val);
+    renderTokens();renderPlayerList();
+    toast(`${p.name} 退後 ${card.val} 格`);
+  }else if(card.effect==='skip'){
+    p.skipTurns=(p.skipTurns||0)+card.val;
+    toast(`${p.name} 暫停 ${card.val} 回合`);
+  }
+  setTimeout(nextTurn,600);
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.add('hidden');
+  if(id==='sq-modal'&&diceRolling===false&&gameStarted){
+    // If closed from land, proceed to next turn
+    diceRolling=false;
+    document.getElementById('roll-btn').disabled=false;
+    nextTurn();
+    // Only do this once
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── RESPONSIVE SCALE ──────────────────────────────────────────
+function scaleBoard(){
+  const wrap=document.querySelector('.wrap');
+  const available=Math.min(wrap.clientWidth-16,wrap.clientHeight-16);
+  // Board natural size: 8*82 + 0 = 656px (cols: 2×82 + 6×72 = 164+432=596... let me recalc)
+  // grid: 2×82 + 6×72 = 164 + 432 = 596px
+  const boardNatural=596;
+  const scale=Math.min(1,available/boardNatural);
+  document.getElementById('board-scale').style.transform=`scale(${scale})`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+buildBoard();
+scaleBoard();
+window.addEventListener('resize',scaleBoard);
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click',e=>{
+    if(e.target===bg){
+      const id=bg.id;
+      if(id==='sq-modal'||id==='card-modal')return; // don't close these on backdrop
+      closeModal(id);
+    }
+  });
+});
+
+// Handle sq-modal close properly (don't trigger nextTurn on manual open)
+document.getElementById('sq-modal').querySelector('.modal-close').onclick=function(){
+  document.getElementById('sq-modal').classList.add('hidden');
+  // Only call nextTurn if we landed here via game
+  if(gameStarted&&players.length&&!diceRolling){
+    diceRolling=false;
+    document.getElementById('roll-btn').disabled=false;
+    nextTurn();
+  }
+};
+</script>
